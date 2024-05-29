@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model represents the application users
+model User {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(100)
+  age         Int
+  birthday    DateTime
+  location    String      @db.VarChar(255)
+  gender      Gender
+  email       String      @unique @db.VarChar(255)
+  contact     String      @db.VarChar(20)
+  picture     String      @db.VarChar(255)
+  position    Position
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  blogs       Blog[]
+  tasks       Task[]      @relation("UserTasks")
+  issuedTasks Task[]      @relation("IssuedTasks")
+  sleepData   SleepData[]
+  surveys     Survey[]
+}
+
+// Enum for gender
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+// Enum for user positions
+enum Position {
+  SUPERVISOR
+  EMPLOYEE
+}
+
+// Blog model represents blog posts authored by users
+model Blog {
+  id         Int      @id @default(autoincrement())
+  title      String   @db.VarChar(255)
+  pic        String   @db.VarChar(255)
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  authorName String   @db.VarChar(100)
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
+
+  @@index([userId])
+}
+
+// Task model represents tasks associated with users
+model Task {
+  id         Int        @id @default(autoincrement())
+  date       DateTime
+  taskName   String     @db.VarChar(255)
+  status     TaskStatus
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  user       User?      @relation(name: "UserTasks", fields: [userId], references: [id])
+  userId     Int?
+  issuedBy   User?      @relation(name: "IssuedTasks", fields: [issuedById], references: [id])
+  issuedById Int?
+
+  @@index([userId])
+  @@index([issuedById])
+}
+
+// Enum for task status
+enum TaskStatus {
+  UPCOMING
+  COMPLETED
+  CANCELED
+}
+
+// SleepData model represents sleep data associated with users
+model SleepData {
+  id         Int       @id @default(autoincrement())
+  date       DateTime
+  sleepStart DateTime
+  sleepEnd   DateTime
+  sleepType  SleepType
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  user       User?     @relation(fields: [userId], references: [id])
+  userId     Int?
+
+  @@index([userId])
+}
+
+// Enum for sleep type
+enum SleepType {
+  TODAY
+  WEEKLY
+  MONTHLY
+}
+
+// Survey model represents surveys created by users
+model Survey {
+  id          Int        @id @default(autoincrement())
+  title       String     @db.VarChar(255)
+  description String     @db.Text
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  user        User?      @relation(fields: [userId], references: [id])
+  userId      Int?
+  questions   Question[]
+
+  @@index([userId])
+}
+
+// Question model represents questions within surveys
+model Question {
+  id            Int        @id @default(autoincrement())
+  question      String     @db.VarChar(255)
+  answerType    AnswerType
+  options       Json?
+  correctAnswer String?    @db.VarChar(255)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  survey        Survey?    @relation(fields: [surveyId], references: [id])
+  surveyId      Int?
+
+  @@index([surveyId])
+}
+
+// Enum for answer type in survey questions
+enum AnswerType {
+  PLAIN_TEXT
+  DROPDOWN
+}
