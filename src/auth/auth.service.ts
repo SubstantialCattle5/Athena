@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { UserService } from 'src/user/user.service';
+import { GoogleUserDto } from './dto/google-user-dto';
 
 @Injectable()
 export class AuthService {
+  constructor(private readonly userService: UserService) {}
   async getNewAccessToken(refreshToken: string): Promise<string> {
     try {
       const response = await axios.post(
@@ -21,6 +24,20 @@ export class AuthService {
     }
   }
 
+  async handleGoogleLogin(user: any) {
+    const googleUserDto: GoogleUserDto = {
+      id: user.id,
+      email: user.email,
+      verified_email: user.verified_email,
+      name: user.name,
+      given_name: user.given_name,
+      family_name: user.family_name,
+      picture: user.picture,
+      locale: user.locale,
+    };
+
+    return await this.userService.loginWithGoogle(googleUserDto);
+  }
   async getProfile(token: string) {
     try {
       return axios.get(

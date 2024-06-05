@@ -39,6 +39,7 @@ enum Gender {
 enum Position {
   SUPERVISOR
   EMPLOYEE
+  USER
 }
 
 // Blog model represents blog posts authored by users
