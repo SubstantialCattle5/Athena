@@ -25,5 +25,5 @@ COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3000
 # or during execution ❓
-CMD [ "npm", "run", "start:migrate:prod" ]
+CMD [ "yarn", "run", "start:migrate:prod" ]
 

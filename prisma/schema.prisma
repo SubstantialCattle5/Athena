@@ -53,6 +53,7 @@ model Blog {
   authorName String   @db.VarChar(100)
   user       User?    @relation(fields: [userId], references: [id])
   userId     Int?
+  region    String    @default("general")
 
   @@index([userId])
 }
