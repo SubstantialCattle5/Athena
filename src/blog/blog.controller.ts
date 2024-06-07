@@ -32,7 +32,7 @@ export class BlogController {
     @ApiResponse({ status: 200, description: 'Blog retrieved successfully.' })
     @ApiResponse({ status: 404, description: 'Blog not found.' })
     async findById(@Param('id') id: number, @Res() res) {
-        const result = await this.blogService.findById(id);
+        const result = await this.blogService.findById(+id);
         return res.status(result.status).json(result);
     }
 
@@ -41,7 +41,7 @@ export class BlogController {
     @ApiResponse({ status: 200, description: 'Blog updated successfully.' })
     @ApiResponse({ status: 404, description: 'Blog not found.' })
     async update(@Param('id') id: number, @Body() updateBlogDto: UpdateBlogDto, @Res() res) {
-        const result = await this.blogService.update(id, updateBlogDto);
+        const result = await this.blogService.update(+id, updateBlogDto);
         return res.status(result.status).json(result);
     }
 
