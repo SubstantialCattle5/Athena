@@ -44,7 +44,13 @@ export class SurveyService {
    * @returns List of all surveys
    */
   async findAll() {
-    const surveys = await this.prismaService.survey.findMany();
+    const surveys = await this.prismaService.survey.findMany(
+      {
+        include : {
+          questions : true
+        }
+      }
+    );
     return { status: 200, data: surveys };
   }
 
@@ -127,7 +133,7 @@ export class SurveyService {
     }
 
     const answers = surveys.map((survey) => survey.description);
-    
+
     const response = { data: answers, status: 201 }
     //? const response = await this.httpService.post('https://api.gemini.com/inferences', { answers }).toPromise();
 
