@@ -9,23 +9,27 @@ datasource db {
 
 // User model represents the application users
 model User {
-  id          Int         @id @default(autoincrement())
-  name        String      @db.VarChar(100)
-  age         Int
-  birthday    DateTime
-  location    String      @db.VarChar(255)
-  gender      Gender
-  email       String      @unique @db.VarChar(255)
-  contact     String      @db.VarChar(20)
-  picture     String      @db.VarChar(255)
-  position    Position
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  blogs       Blog[]
-  tasks       Task[]      @relation("UserTasks")
-  issuedTasks Task[]      @relation("IssuedTasks")
-  sleepData   SleepData[]
-  surveys     Survey[]
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(100)
+  age           Int
+  birthday      DateTime
+  location      String         @db.VarChar(255)
+  gender        Gender
+  email         String         @unique @db.VarChar(255)
+  contact       String         @db.VarChar(20)
+  picture       String         @db.VarChar(255)
+  position      Position
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  blogs         Blog[]
+  tasks         Task[]         @relation("UserTasks")
+  issuedTasks   Task[]         @relation("IssuedTasks")
+  sleepData     SleepData[]
+  surveys       Survey[]
+  medicalQueries MedicalQuery[]
+
+  @@index([email])
+  @@index([name])
 }
 
 // Enum for gender
@@ -46,16 +50,17 @@ enum Position {
 model Blog {
   id         Int      @id @default(autoincrement())
   title      String   @db.VarChar(255)
-  pic        String   @db.VarChar(255)
+  picture    String   @db.VarChar(255)
   content    String   @db.Text
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   authorName String   @db.VarChar(100)
-  user       User?    @relation(fields: [userId], references: [id])
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int?
-  region    String    @default("general")
+  region     String   @default("general")
 
   @@index([userId])
+  @@index([title])
 }
 
 // Task model represents tasks associated with users
@@ -66,9 +71,9 @@ model Task {
   status     TaskStatus
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
-  user       User?      @relation(name: "UserTasks", fields: [userId], references: [id])
+  user       User?      @relation(name: "UserTasks", fields: [userId], references: [id], onDelete: Cascade)
   userId     Int?
-  issuedBy   User?      @relation(name: "IssuedTasks", fields: [issuedById], references: [id])
+  issuedBy   User?      @relation(name: "IssuedTasks", fields: [issuedById], references: [id], onDelete: SetNull)
   issuedById Int?
 
   @@index([userId])
@@ -91,7 +96,7 @@ model SleepData {
   sleepType  SleepType
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
-  user       User?     @relation(fields: [userId], references: [id])
+  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int?
 
   @@index([userId])
@@ -111,8 +116,51 @@ model Survey {
   description String     @db.Text
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  user        User?      @relation(fields: [userId], references: [id])
+  user        User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int?
+  questions   Question[]
+  
+  @@index([userId])
+  @@index([topic])
+}
+
+// Question model represents questions in surveys
+model Question {
+  id          Int          @id @default(autoincrement())
+  text        String       @db.Text
+  type        QuestionType
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  survey      Survey?      @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  surveyId    Int?
+
+  @@index([surveyId])
+}
+
+// Enum for question types
+enum QuestionType {
+  MULTIPLE_CHOICE
+  OPEN_ENDED
+  BOOLEAN
+}
+
+// MedicalQuery model represents medical queries made by users
+model MedicalQuery {
+  id          Int           @id @default(autoincrement())
+  query       String        @db.Text
+  response    String        @db.Text
+  status      QueryStatus
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  user        User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int?
+
   @@index([userId])
 }
 
+// Enum for query status
+enum QueryStatus {
+  PENDING
+  RESPONDED
+  CLOSED
+}
