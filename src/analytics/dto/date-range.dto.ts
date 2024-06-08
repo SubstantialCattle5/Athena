@@ -2,10 +2,10 @@ import { IsDate, IsNumber, IsString } from "class-validator";
 
 export class DateRangeDto {
 
-    @IsNumber()
-    startDate: number;
+    @IsDate()
+    startDate: Date;
 
-    @IsNumber()
-    endDate: number;
+    @IsDate()
+    endDate: Date;
 
 }

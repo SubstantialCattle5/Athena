@@ -16,14 +16,12 @@ export class AnalyticsService {
       }
 
       const { startDate, endDate } = dateRange;
-      const startDateFix = new Date(startDate, 0, 1).toISOString();
-      const endDateFix = new Date(endDate, 0, 1).toISOString();
       // Total users 
       const totalUsers = await this.prismaService.user.count({
         where: {
           createdAt: {
-            gte: startDateFix,
-            lte: endDateFix
+            gte: startDate,
+            lte: endDate
           }
         }
       });
@@ -32,8 +30,8 @@ export class AnalyticsService {
       const totalBlogs = await this.prismaService.blog.count({
         where: {
           createdAt: {
-            gte: startDateFix,
-            lte: endDateFix
+            gte: startDate,
+            lte: endDate
           }
         }
       });
