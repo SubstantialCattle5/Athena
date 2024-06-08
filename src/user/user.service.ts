@@ -24,9 +24,7 @@ export class UserService {
 
   async findAll() {
     try {
-      return await this.prismaService.user.findMany({
-        where: { position: 'USER' },
-      });
+      return await this.prismaService.user.findMany();
     } catch (error) {
       this.handlePrismaError(error, 'fetch all users');
     }
