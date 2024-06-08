@@ -1,70 +1,128 @@
-import { PrismaClient, Gender, Position, TaskStatus, SleepType } from '@prisma/client';
+import { PrismaClient, Gender, Position, TaskStatus, SleepType, QuestionType, QueryStatus } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  for (let i = 0; i < 100; i++) {
+  await prisma.$connect();
+
+  // Generate users
+  const users = [];
+  for (let i = 0; i < 10; i++) {
     const user = await prisma.user.create({
       data: {
-        name: faker.name.fullName().slice(0, 100),  // Ensure name is at most 100 characters
-        age: faker.datatype.number({ min: 18, max: 80 }),
-        birthday: faker.date.past(50, new Date('2002-01-01')),
-        location: faker.address.city().slice(0, 255),  // Ensure location is at most 255 characters
-        gender: faker.helpers.arrayElement([Gender.MALE, Gender.FEMALE, Gender.OTHER]),
-        email: faker.internet.email().slice(0, 255),  // Ensure email is at most 255 characters
-        contact: faker.phone.number().slice(0, 20),  // Ensure contact is at most 20 characters
-        picture: faker.image.avatar().slice(0, 255),  // Ensure picture URL is at most 255 characters
-        position: faker.helpers.arrayElement([Position.SUPERVISOR, Position.EMPLOYEE, Position.USER]),
-        blogs: {
-          create: [
-            {
-              title: faker.lorem.sentence().slice(0, 255),  // Ensure title is at most 255 characters
-              pic: faker.image.imageUrl().slice(0, 255),  // Ensure picture URL is at most 255 characters
-              content: faker.lorem.paragraphs(3),
-              authorName: faker.name.fullName().slice(0, 100),  // Ensure author name is at most 100 characters
-            },
-          ],
-        },
-        tasks: {
-          create: [
-            {
-              date: faker.date.future(),
-              taskName: faker.lorem.words(3).slice(0, 255),  // Ensure task name is at most 255 characters
-              status: faker.helpers.arrayElement([TaskStatus.UPCOMING, TaskStatus.COMPLETED, TaskStatus.CANCELED]),
-            },
-          ],
-        },
-        sleepData: {
-          create: [
-            {
-              date: faker.date.recent(),
-              sleepStart: faker.date.recent(),
-              sleepEnd: faker.date.recent(),
-              sleepType: faker.helpers.arrayElement([SleepType.TODAY, SleepType.WEEKLY, SleepType.MONTHLY]),
-            },
-          ],
-        },
-        surveys: {
-          create: [
-            {
-              topic: faker.lorem.word().slice(0, 255),  // Ensure topic is at most 255 characters
-              description: faker.lorem.paragraph(),
-            },
-          ],
-        },
+        name: faker.name.fullName(),
+        age: faker.datatype.number({ min: 18, max: 70 }),
+        birthday: faker.date.past(50, new Date('2000-01-01')),
+        location: faker.address.city(),
+        gender: faker.helpers.arrayElement(Object.values(Gender)),
+        email: faker.internet.email(),
+        contact: faker.phone.number('##########'),
+        picture: faker.image.avatar(),
+        position: faker.helpers.arrayElement(Object.values(Position)),
       },
     });
+    users.push(user);
+  }
 
-    console.log(`Created user with id: ${user.id}`);
+  // Generate blogs
+  for (const user of users) {
+    for (let i = 0; i < 3; i++) {
+      await prisma.blog.create({
+        data: {
+          title: faker.lorem.sentence(),
+          picture: faker.image.imageUrl(),
+          content: faker.lorem.paragraphs(3),
+          authorName: user.name,
+          userId: user.id,
+          region: faker.helpers.arrayElement(['general', 'tech', 'health', 'travel']),
+        },
+      });
+    }
+  }
+
+  // Generate tasks
+  for (const user of users) {
+    for (let i = 0; i < 3; i++) {
+      await prisma.task.create({
+        data: {
+          date: faker.date.future(),
+          taskName: faker.lorem.words(3),
+          status: faker.helpers.arrayElement(Object.values(TaskStatus)),
+          userId: user.id,
+          issuedById: faker.helpers.arrayElement(users).id,
+        },
+      });
+    }
+  }
+
+  // Generate sleep data
+  for (const user of users) {
+    for (let i = 0; i < 3; i++) {
+      await prisma.sleepData.create({
+        data: {
+          date: faker.date.past(),
+          sleepStart: faker.date.past(),
+          sleepEnd: faker.date.past(),
+          sleepType: faker.helpers.arrayElement(Object.values(SleepType)),
+          userId: user.id,
+        },
+      });
+    }
+  }
+
+  // Generate surveys and questions
+  for (const user of users) {
+    for (let i = 0; i < 2; i++) {
+      const survey = await prisma.survey.create({
+        data: {
+          topic: faker.lorem.words(3),
+          description: faker.lorem.paragraphs(2),
+          userId: user.id,
+        },
+      });
+
+      for (let j = 0; j < 5; j++) {
+        const question = await prisma.question.create({
+          data: {
+            text: faker.lorem.sentence(),
+            type: faker.helpers.arrayElement(Object.values(QuestionType)),
+            correctAnswer: faker.lorem.sentence(),
+            surveyId: survey.id,
+          },
+        });
+
+        // Generate answers
+        for (const user of users) {
+          await prisma.answer.create({
+            data: {
+              response: faker.lorem.sentence(),
+              userId: user.id,
+              questionId: question.id,
+            },
+          });
+        }
+      }
+    }
+  }
+
+  // Generate medical queries
+  for (const user of users) {
+    for (let i = 0; i < 2; i++) {
+      await prisma.medicalQuery.create({
+        data: {
+          query: faker.lorem.paragraph(),
+          response: faker.lorem.paragraph(),
+          status: faker.helpers.arrayElement(Object.values(QueryStatus)),
+          userId: user.id,
+        },
+      });
+    }
   }
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
+  .catch((e) => console.error(e))
   .finally(async () => {
     await prisma.$disconnect();
   });

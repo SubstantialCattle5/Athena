@@ -27,6 +27,7 @@ model User {
   sleepData     SleepData[]
   surveys       Survey[]
   medicalQueries MedicalQuery[]
+  answers       Answer[]
 
   @@index([email])
   @@index([name])
@@ -129,10 +130,12 @@ model Question {
   id          Int          @id @default(autoincrement())
   text        String       @db.Text
   type        QuestionType
+  correctAnswer String     @db.Text
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   survey      Survey?      @relation(fields: [surveyId], references: [id], onDelete: Cascade)
   surveyId    Int?
+  answers     Answer[]
 
   @@index([surveyId])
 }
@@ -142,6 +145,21 @@ enum QuestionType {
   MULTIPLE_CHOICE
   OPEN_ENDED
   BOOLEAN
+}
+
+// Answer model represents answers to survey questions
+model Answer {
+  id          Int          @id @default(autoincrement())
+  response    String       @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int?
+  question    Question?    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId  Int?
+
+  @@index([userId])
+  @@index([questionId])
 }
 
 // MedicalQuery model represents medical queries made by users

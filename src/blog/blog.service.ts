@@ -32,7 +32,7 @@ export class BlogService {
 
         // Create a new blog entry
         const blog = await this.prismaService.blog.create({
-            data: { title, region, pic, content, authorName: author.name }
+            data: { title, region, picture:pic, content, authorName: author.name }
         });
 
         return { status: 201, data: blog };
@@ -97,7 +97,7 @@ export class BlogService {
 
         const updatedBlog = await this.prismaService.blog.update({
             where: { id },
-            data: { title, region, pic, content }
+            data: { title, region, picture:pic, content }
         });
 
         return { status: 200, data: updatedBlog };
