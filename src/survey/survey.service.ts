@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSurveyDto } from './dto/create-survey.dto';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -7,83 +7,56 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class SurveyService {
   constructor(private readonly prismaService: PrismaService) { }
 
-  /**
-   * Create a new survey
-   * @param createSurveyDto - Data transfer object containing survey details
-   * @returns Created survey entry
-   */
   async create(createSurveyDto: CreateSurveyDto) {
-    const { topic, description, userId } = createSurveyDto;
+    // const { topic, description, userId, questions } = createSurveyDto;
+    // const user = await this.prismaService.user.findFirst({
+    //   where: {
+    //     id: userId,
+    //   },
+    // });
 
-    // Find the user by ID
-    const user = await this.prismaService.user.findFirst({
-      where: {
-        id: userId,
-      },
-    });
+    // if (!user) {
+    //   throw new BadRequestException('User not found');
+    // }
 
-    // Check if the user exists
-    if (!user) {
-      return { status: 404, message: 'User not found' };
-    }
-
-    // Create a new survey entry
-    const survey = await this.prismaService.survey.create({
-      data: {
-        topic,
-        description,
-        userId: user.id,
-      },
-    });
-
-    return { status: 201, data: survey };
+    // const survey = await this.prismaService.survey.create({
+    //   data: {
+    //     topic,
+    //     description,
+    //     userId: user.id,
+    //     questions : { 
+    //       connect : questions.map(id => ({id}))
+    //     }
+    //   },
+    // });
+    const survey = "fix"
+    return survey;
   }
 
-  /**
-   * Find all surveys
-   * @returns List of all surveys
-   */
   async findAll() {
-    const surveys = await this.prismaService.survey.findMany(
-      {
-        include : {
-          questions : true
-        }
-      }
-    );
-    return { status: 200, data: surveys };
+    const surveys = await this.prismaService.survey.findMany();
+    return surveys;
   }
 
-  /**
-   * Find a survey by ID
-   * @param id - ID of the survey to retrieve
-   * @returns Survey entry or error response
-   */
   async findOne(id: number) {
     const survey = await this.prismaService.survey.findUnique({
       where: { id },
     });
 
     if (!survey) {
-      return { status: 404, message: 'Survey not found' };
+      throw new NotFoundException('Survey not found');
     }
 
-    return { status: 200, data: survey };
+    return survey;
   }
 
-  /**
-   * Update a survey by ID
-   * @param id - ID of the survey to update
-   * @param updateSurveyDto - Data transfer object containing updated survey details
-   * @returns Updated survey entry or error response
-   */
   async update(id: number, updateSurveyDto: UpdateSurveyDto) {
     const survey = await this.prismaService.survey.findUnique({
       where: { id },
     });
 
     if (!survey) {
-      return { status: 404, message: 'Survey not found' };
+      throw new NotFoundException('Survey not found');
     }
 
     const updatedSurvey = await this.prismaService.survey.update({
@@ -91,36 +64,25 @@ export class SurveyService {
       data: updateSurveyDto,
     });
 
-    return { status: 200, data: updatedSurvey };
+    return updatedSurvey;
   }
 
-  /**
-   * Remove a survey by ID
-   * @param id - ID of the survey to remove
-   * @returns Success message or error response
-   */
   async remove(id: number) {
     const survey = await this.prismaService.survey.findUnique({
       where: { id },
     });
 
     if (!survey) {
-      return { status: 404, message: 'Survey not found' };
+      throw new NotFoundException('Survey not found');
     }
 
     await this.prismaService.survey.delete({
       where: { id },
     });
 
-    return { status: 200, message: 'Survey removed successfully' };
+    return `Survey removed successfully`;
   }
 
-
-  /**
-    * Fetch answers and get inferences from the Gemini API based on the survey topic
-    * @param topic - Topic of the survey to fetch answers for
-    * @returns Inferences from the Gemini API
-    */
   async getInferences(topic: string) {
     const surveys = await this.prismaService.survey.findMany({
       where: {
@@ -129,7 +91,7 @@ export class SurveyService {
     });
 
     if (!surveys.length) {
-      throw new HttpException('No surveys found for the given topic', 404);
+      throw new NotFoundException('No surveys found for the given topic');
     }
 
     const answers = surveys.map((survey) => survey.description);
@@ -141,6 +103,6 @@ export class SurveyService {
       throw new HttpException('Failed to get inferences from Gemini API', response.status);
     }
 
-    return { status: 200, data: response.data };
+    return response.data;
   }
 }

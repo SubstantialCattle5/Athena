@@ -24,3 +24,10 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
+
+/** TODO
+ * 1. finish up auth 
+ * 2. fix survey 
+ * 3. fix quiz
+ * 
+  */
