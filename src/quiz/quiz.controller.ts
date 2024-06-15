@@ -1,15 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { QuizService } from './quiz.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
+import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UserInterface } from 'src/auth/interfaces/user.interface';
+import { User } from 'src/auth/auth.decorator';
 
+@UseGuards(JwtGuard)
 @Controller('quiz')
 export class QuizController {
-  constructor(private readonly quizService: QuizService) {}
+  constructor(private readonly quizService: QuizService) { }
 
+
+  @UseGuards(RolesGuard)
   @Post()
-  create(@Body() createQuizDto: CreateQuizDto) {
-    return this.quizService.create(createQuizDto);
+  create(@Body() createQuizDto: CreateQuizDto, @User() user: UserInterface) {
+    return this.quizService.create(user.id,createQuizDto);
   }
 
   @Get()

@@ -9,7 +9,6 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { QuizModule } from './quiz/quiz.module';
-import { QuizModule } from './quiz/quiz.module';
 
 @Module({
   imports: [
