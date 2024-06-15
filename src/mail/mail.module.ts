@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { ConfigModule } from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { ConfigService } from '@nestjs/config';
           from: '"GooglexYug" <tomoyoko959@gmail.com>',
         },
         template: {
-          dir: 'dist/mail/templates',
+          dir: join(__dirname, '..', 'mail', 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,

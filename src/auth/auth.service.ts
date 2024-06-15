@@ -12,6 +12,7 @@ import { MailService } from '../mail/mail.service';
 import { ConfigService } from '@nestjs/config';
 import { otpCache } from './interfaces/otpCache.interface';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { SignUpDTO } from './dto/signup.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,18 +24,57 @@ export class AuthService {
     readonly configService: ConfigService,
   ) { }
 
+  async signup(signUpDto: SignUpDTO) {
+    const { age, birthday, contact, email, gender, location, name, picture, position } = signUpDto;
+    try {
+      const checkUser = await this.prisma.user.findUnique({
+        where: {
+          email
+        }
+      })
+      console.log("🚀 ~ AuthService ~ signup ~ checkUser:", checkUser)
+      if (checkUser) {
+        return {
+          error: "User exist",
+          statusCode: 400,
+          message: 'User already exists',
+        };
+      }
+      return await this.prisma.user.create({
+        data: {
+          age,
+          birthday,
+          contact,
+          email,
+          gender,
+          location,
+          name,
+          picture,
+          position
+        }
+      })
+    }
+    catch (error) {
+      return {
+        statusCode: 501,
+        message: 'An error occurred during signup',
+        error: "unknown error occured",
+      };
+    }
+
+  }
   async login(email: string) {
     try {
       let user: UserInterface;
-        user = await this.prisma.user.findUniqueOrThrow({
-          where: {
-            email
-          },
-          select: {
-            id: true,
-            position: true
-          }
-        })
+      user = await this.prisma.user.findUniqueOrThrow({
+        where: {
+          email
+        },
+        select: {
+          id: true,
+          position: true
+        }
+      })
 
       const otp = randomInt(100000, 1000000); // 6 digit otp
       const otpId = randomUUID();

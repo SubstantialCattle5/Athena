@@ -18,5 +18,7 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": ["src/**/*.ts", "mail/templates/**/*"],  // Ensure templates are included
+  "exclude": ["node_modules"]
 }

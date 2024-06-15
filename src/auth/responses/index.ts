@@ -1,5 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiBadRequestResponse, ApiResponse } from '@nestjs/swagger';
 import {
   BadLoginRequestResponse,
   InvalidEmailResponse,
@@ -15,6 +15,13 @@ import {
   InvalidRefreshTokenResponse,
   BadRefreshRequestResponse,
 } from './refresh.response';
+import {
+  UserCreatedResponse,
+  UserAlreadyExistsResponse,
+  SignupErrorResponse,
+} from './signup.response'; // Ensure these paths are correct
+import { SignUpDTO } from '../dto/signup.dto';
+
 
 export const loginResponseDoc = () => {
   return applyDecorators(
@@ -37,5 +44,14 @@ export const refreshResponseDoc = () => {
     ApiResponse(RefreshSuccessfulResponse),
     ApiResponse(InvalidRefreshTokenResponse),
     ApiBadRequestResponse(BadRefreshRequestResponse),
+  );
+};
+
+export const signupResponseDoc = () => {
+  return applyDecorators(
+    ApiBody({ type: SignUpDTO }),
+    ApiResponse(UserCreatedResponse),
+    ApiResponse(UserAlreadyExistsResponse),
+    ApiBadRequestResponse(SignupErrorResponse),
   );
 };

@@ -4,12 +4,22 @@ import { RefreshDto } from './dto/refresh.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { OtpDto } from './dto/otp.dto';
-import { loginResponseDoc, otpResponseDoc, refreshResponseDoc } from './responses';
+import {
+  loginResponseDoc, otpResponseDoc,
+  refreshResponseDoc, signupResponseDoc
+} from './responses';
+import { SignUpDTO } from './dto/signup.dto';
+
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
+  @signupResponseDoc()
+  @Post('signup')
+  async signup(@Body() signUpDto: SignUpDTO) {
+    return await this.authService.signup(signUpDto);
+  }
   @loginResponseDoc()
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
