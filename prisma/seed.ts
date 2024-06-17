@@ -108,7 +108,7 @@ async function main() {
 
   // Generate medical queries
   for (const user of users) {
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 1; i++) {
       await prisma.medicalQuery.create({
         data: {
           query: faker.lorem.paragraph(),
