@@ -10,6 +10,7 @@ export class AnalyticsService {
 
   // Fetches all analytics data within a given date range
   async findAll(dateRange: DateRangeDto) {
+    console.log(dateRange)
     try {
       if (!dateRange.startDate || !dateRange.endDate) {
         throw new Error('Invalid date range');
@@ -44,6 +45,12 @@ export class AnalyticsService {
       const queries = await this.prismaService.medicalQuery.findMany({
         orderBy: {
           createdAt: "desc"
+        },
+        where: {
+          createdAt: {
+            gte: startDate,
+            lte: endDate
+          }
         }
       });
 

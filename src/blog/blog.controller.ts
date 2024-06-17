@@ -50,7 +50,7 @@ export class BlogController {
     @ApiResponse({ status: 200, description: 'Blog deleted successfully.' })
     @ApiResponse({ status: 404, description: 'Blog not found.' })
     async delete(@Param('id') id: number, @Res() res) {
-        const result = await this.blogService.delete(id);
+        const result = await this.blogService.delete(+id);
         return res.status(result.status).json(result);
     }
 }
