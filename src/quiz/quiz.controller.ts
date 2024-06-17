@@ -4,8 +4,8 @@ import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { JwtGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { UserInterface } from 'src/auth/interfaces/user.interface';
-import { User } from 'src/auth/auth.decorator';
+import { UserInterface } from '../auth/interfaces/user.interface';
+import { User } from '../auth/auth.decorator';
 
 @UseGuards(JwtGuard)
 @Controller('quiz')
