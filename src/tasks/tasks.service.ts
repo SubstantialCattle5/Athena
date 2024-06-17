@@ -5,25 +5,33 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
-  async create(createTaskDto: CreateTaskDto) {
-    const { IssueByEmail, IssuedToEmail, date, taskName } = createTaskDto;
+  /**
+   * Asynchronously creates a new task.
+   * 
+   * This function creates a task with the given details, associates it with the users
+   * identified by their email and ID, and sets the task status to 'UPCOMING'.
+   * 
+   * @param {CreateTaskDto} createTaskDto - The data transfer object containing task details.
+   * @param {number} userId - The ID of the user issuing the task.
+   * @returns The newly created task object.
+   * @throws {InternalServerErrorException} If there is an error during task creation.
+   */
+  async create(createTaskDto: CreateTaskDto, userId: number) {
+    const { IssuedToEmail, date, taskName } = createTaskDto;
 
-    const issuedTo = await this.prismaService.user.findUnique({
+    const issuedTo = await this.prismaService.user.findUniqueOrThrow({
       where: {
         email: IssuedToEmail
       }
     });
-    const issuedBy = await this.prismaService.user.findUnique({
+    const issuedBy = await this.prismaService.user.findUniqueOrThrow({
       where: {
-        email: IssueByEmail
+        id: userId
       }
     });
 
-    if (!issuedBy || !issuedTo) {
-      throw new BadRequestException('User not found');
-    }
 
     try {
       const result = await this.prismaService.task.create({
@@ -42,10 +50,20 @@ export class TasksService {
     }
   }
 
-  async findAll(email: string) {
+  /**
+* Asynchronously finds all tasks associated with a user.
+* 
+* This function retrieves all tasks where the user is either the issuer or the assignee.
+* It differentiates the tasks issued by the user from those issued to the user.
+* 
+* @param {string} email - The email of the user whose tasks are to be found.
+* @returns An object containing two arrays: 'issuedToTheUser' and 'issuedByTheUser'.
+* @throws {NotFoundException} If the user with the given email is not found.
+*/
+  async findAll(userId: number) {
     const user = await this.prismaService.user.findUnique({
       where: {
-        email
+        id: userId
       }
     });
 
@@ -65,6 +83,7 @@ export class TasksService {
         ]
       }
     });
+    console.log("🚀 ~ TasksService ~ findAll ~ tasks:", tasks)
 
     return {
       issuedToTheUser: tasks.filter(task => task.issuedById == user.id),
@@ -72,22 +91,50 @@ export class TasksService {
     };
   }
 
+  /**
+ * Asynchronously finds a single task by its ID.
+ * 
+ * This function retrieves a task based on the provided ID. If no task is found,
+ * it throws an exception.
+ * 
+ * @param {number} id - The ID of the task to be retrieved.
+ * @returns The task object if found.
+ * @throws {NotFoundException} If no task with the given ID is found.
+ */
   async findOne(id: number) {
-    const task = await this.prismaService.task.findUnique({
-      where: {
-        id
-      }
-    });
+    try {
+      const task = await this.prismaService.task.findUnique({
+        where: {
+          id
+        }
+      });
 
-    if (!task) {
-      throw new NotFoundException('Task not available');
+      if (!task) {
+        throw new NotFoundException('Task not available');
+      }
+
+      return task;
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong')
     }
 
-    return task;
   }
 
+  /**
+ * Asynchronously updates an existing task.
+ * 
+ * This function updates a task with the given ID using the provided task details.
+ * If no task is found with the ID, it throws an exception. The function also sets
+ * the 'updatedAt' field to the current date and time.
+ * 
+ * @param {number} id - The ID of the task to be updated.
+ * @param {UpdateTaskDto} updateTaskDto - The data transfer object containing updated task details.
+ * @returns The updated task object.
+ * @throws {NotFoundException} If no task with the given ID is found.
+ * @throws {InternalServerErrorException} If there is an error during task update.
+ */
   async update(id: number, updateTaskDto: UpdateTaskDto) {
-    const { IssueByEmail, IssuedToEmail, date, taskName, status } = updateTaskDto;
+    const { IssuedToEmail, date, taskName, status } = updateTaskDto;
 
     const task = await this.prismaService.task.findUnique({
       where: {
@@ -108,7 +155,7 @@ export class TasksService {
           taskName,
           date,
           updatedAt: new Date(),
-          status
+          status,
         }
       });
 
@@ -118,6 +165,17 @@ export class TasksService {
     }
   }
 
+  /**
+ * Asynchronously removes a task by its ID.
+ * 
+ * This function deletes a task based on the provided ID. If no task is found,
+ * it throws an exception. Upon successful deletion, it returns a confirmation message.
+ * 
+ * @param {number} id - The ID of the task to be removed.
+ * @returns A confirmation message indicating successful removal.
+ * @throws {NotFoundException} If no task with the given ID is found.
+ * @throws {InternalServerErrorException} If there is an error during task removal.
+ */
   async remove(id: number) {
     const task = await this.prismaService.task.findUnique({
       where: { id },

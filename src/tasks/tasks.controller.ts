@@ -1,10 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { User } from 'src/auth/auth.decorator';
+import { UserInterface } from 'src/auth/interfaces/user.interface';
 
+@ApiBearerAuth()
 @ApiTags("Task")
+@UseGuards(JwtGuard)
 @Controller('tasks')
 export class TasksController {
   // Injecting the TasksService into the controller
@@ -14,8 +19,8 @@ export class TasksController {
   @Post()
   @ApiOperation({ summary: "Create a new task" })
   @ApiResponse({ status: 201, description: 'The task has been successfully created.' })
-  async create(@Body() createTaskDto: CreateTaskDto) {
-    const result = await this.tasksService.create(createTaskDto);
+  async create(@Body() createTaskDto: CreateTaskDto, @User() user: UserInterface) {
+    const result = await this.tasksService.create(createTaskDto, user.id);
     return result;
   }
 
@@ -23,9 +28,10 @@ export class TasksController {
   @Get()
   @ApiOperation({ summary: "Find all tasks based on user" })
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
-  @ApiQuery({ name: 'email', type: String, description: 'The email of the user', required: true })
-  async findAll(@Query('email') email: string) {
-    const result = await this.tasksService.findAll(email);
+  async findAll(@User() user: UserInterface) {
+
+    const result = 'asd'
+    // const result = await this.tasksService.findAll(user.id);
     return result;
   }
 

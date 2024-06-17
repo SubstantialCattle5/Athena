@@ -2,7 +2,6 @@ import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { GoogleUserDto } from 'src/auth/dto/google-user-dto';
 
 @Injectable()
 export class UserService {
@@ -70,43 +69,6 @@ export class UserService {
     }
   }
 
-  async loginWithGoogle(googleUserDto: GoogleUserDto) {
-    const { email, given_name, family_name, picture } = googleUserDto;
-
-    try {
-      let user = await this.prismaService.user.findUnique({ where: { email } });
-
-      if (!user) {
-        user = await this.prismaService.user.create({
-          data: {
-            name: `${given_name} ${family_name}`,
-            email,
-            picture,
-            position: 'USER', // Default position
-            age: 18,
-            birthday: new Date('2002-12-21'), // Correct date format
-            location: 'Mumbai',
-            gender: 'MALE',
-            contact: "number"
-          },
-        });
-        this.logger.log(`User created with Google login: ${email}`);
-      } else {
-        user = await this.prismaService.user.update({
-          where: { email },
-          data: {
-            name: `${given_name} ${family_name}`,
-            picture,
-          },
-        });
-        this.logger.log(`User updated with Google login: ${email}`);
-      }
-
-      return user;
-    } catch (error) {
-      this.handlePrismaError(error, 'login with Google');
-    }
-  }
 
   private handlePrismaError(error: unknown, context: string) {
     if (error instanceof Error) {

@@ -16,7 +16,7 @@ RUN yarn run build
 
 # as build step❓
 
-FROM node:18
+FROM node:20
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
