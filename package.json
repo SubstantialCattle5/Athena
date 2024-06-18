@@ -26,6 +26,9 @@
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   },
+  "resolutions": {
+    "string-width": "4.2.3"
+  },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
     "@google/generative-ai": "^0.12.0",
@@ -46,6 +49,7 @@
     "cache-manager": "^5.6.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
+    "date-fns": "^3.6.0",
     "generative-ai": "^0.1.4",
     "mailer": "^0.6.7",
     "nodemailer": "^6.9.13",
