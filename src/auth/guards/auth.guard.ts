@@ -12,7 +12,7 @@ export class JwtGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -20,12 +20,14 @@ export class JwtGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException();
     }
+
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: await this.configService.get('ACCESS_TOKEN_SECRET'),
       });
       request['user'] = payload;
-    } catch {
+
+    } catch (error) {
       throw new UnauthorizedException();
     }
     return true;

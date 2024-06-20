@@ -83,7 +83,6 @@ export class TasksService {
         ]
       }
     });
-    console.log("🚀 ~ TasksService ~ findAll ~ tasks:", tasks)
 
     return {
       issuedToTheUser: tasks.filter(task => task.issuedById == user.id),

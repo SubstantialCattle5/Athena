@@ -2,55 +2,124 @@ import { Injectable } from '@nestjs/common';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class QuizService {
 
   constructor(private readonly prismaService: PrismaService) { }
+
+  private handleError(error: any): never {
+    console.error(error); // Log the error for debugging
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new Error(`Database request failed: ${error.message}`);
+    } else if (error instanceof Prisma.PrismaClientValidationError) {
+      throw new Error(`Validation failed: ${error.message}`);
+    } else {
+      throw new Error('An unexpected error occurred');
+    }
+  }
+
   async create(userId: number, createQuizDto: CreateQuizDto) {
     const { questions, topic } = createQuizDto;
 
-    // create questions 
     try {
-      const quiz = await this.prismaService.quiz.create({
-        data: {
-          topic,
-          userId
-        }
-      })
-
-      questions.map(async (question) => {
-        await this.prismaService.question.create({
+      const result = await this.prismaService.$transaction(async (prisma) => {
+        const quiz = await prisma.quiz.create({
           data: {
-            correctAnswer: question.correctAnswer,
-            text: question.text,
-            options: question.options,
-            type: question.type,
-            quizId: quiz.id
+            topic,
+            userId
           }
-        })
-      })
+        });
+
+        await Promise.all(questions.map(question => {
+          return prisma.question.create({
+            data: {
+              correctAnswer: question.correctAnswer,
+              text: question.text,
+              options: question.options,
+              type: question.type,
+              quizId: quiz.id
+            }
+          });
+        }));
+
+        return quiz;
+      });
+
+      return result;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async findAll(topic: string) {
+    try {
+      const quizzes = await this.prismaService.quiz.findMany({
+        where: { topic },
+        include: {
+          questions: {
+            select: {
+              text: true,
+              type: true,
+              correctAnswer: true,
+              options: true
+            }
+          }
+        }
+      });
+
+      return quizzes.map(quiz => ({
+        topic: quiz.topic,
+        created: quiz.createdAt,
+        questions: quiz.questions
+      }));
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async findOne(id: number) {
+    try {
+      const quiz = await this.prismaService.quiz.findUniqueOrThrow({
+        where: { id },
+        include: {
+          questions: true
+        }
+      });
 
       return quiz;
     } catch (error) {
-      return 'error'
+      this.handleError(error);
     }
-    return 'This action adds a new quiz';
   }
 
-  findAll() {
-    return `This action returns all quiz`;
-  }
+  // async update(id: number, updateQuizDto: UpdateQuizDto) {
+  //   try {
+  //     const updatedQuiz = await this.prismaService.quiz.update({
+  //       where: { id },
+  //       data: updateQuizDto
+  //     });
 
-  findOne(id: number) {
-    return `This action returns a #${id} quiz`;
-  }
+  //     return updatedQuiz;
+  //   } catch (error) {
+  //     this.handleError(error);
+  //   }
+  // }
 
-  update(id: number, updateQuizDto: UpdateQuizDto) {
-    return `This action updates a #${id} quiz`;
-  }
+  async remove(id: number) {
+    try {
+      await this.prismaService.quiz.findUniqueOrThrow({
+        where: { id },
+      });
 
-  remove(id: number) {
-    return `This action removes a #${id} quiz`;
+      const deletedQuiz = await this.prismaService.quiz.delete({
+        where: { id },
+      });
+
+      return deletedQuiz;
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 }
