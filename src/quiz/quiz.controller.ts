@@ -2,38 +2,39 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { QuizService } from './quiz.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
-import { JwtGuard } from '../auth/guards/auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { UserInterface } from '../auth/interfaces/user.interface';
-import { User } from '../auth/auth.decorator';
+import { UserInterface } from 'src/auth/interfaces/user.interface';
+import { User } from 'src/auth/auth.decorator';
+import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { JwtGuard } from 'src/auth/guards/auth.guard';
 
-@UseGuards(JwtGuard)
 @Controller('quiz')
 export class QuizController {
   constructor(private readonly quizService: QuizService) { }
 
-
-  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @Post()
   create(@Body() createQuizDto: CreateQuizDto, @User() user: UserInterface) {
-    return this.quizService.create(user.id,createQuizDto);
+    return this.quizService.create(user.id, createQuizDto);
   }
 
-  @Get()
-  findAll() {
-    return this.quizService.findAll();
+  @Get(":topic")
+  @ApiParam(
+    { name: 'topic', required: true, description: "put a topic" }
+  )
+  findAll(@Body() topics: { topicName: string }) {
+    const topicName = topics.topicName;
+    return this.quizService.findAll(topicName);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.quizService.findOne(+id);
-  }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateQuizDto: UpdateQuizDto) {
-    return this.quizService.update(+id, updateQuizDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateQuizDto: UpdateQuizDto) {
+  //   return this.quizService.update(+id, updateQuizDto);
+  // }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.quizService.remove(+id);

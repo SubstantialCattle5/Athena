@@ -1,14 +1,20 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, Res } from "@nestjs/common";
-import { ApiTags, ApiResponse, ApiOperation } from "@nestjs/swagger";
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, Res, UseGuards } from "@nestjs/common";
+import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from "@nestjs/swagger";
 import { BlogService } from "./blog.service";
 import { CreateBlogDto } from "./dto/create-blog.dto";
 import { UpdateBlogDto } from "./dto/update-blog.dto";
+import { JwtGuard } from "src/auth/guards/auth.guard";
+
 
 @ApiTags('blog')
 @Controller('blog')
+@ApiBearerAuth('JWT')
+@UseGuards(JwtGuard)
 export class BlogController {
     constructor(private readonly blogService: BlogService) { }
 
+    @ApiBearerAuth()
+    @UseGuards(JwtGuard)
     @Post()
     @ApiOperation({ summary: 'Create a new blog' })
     @ApiResponse({ status: 201, description: 'The blog has been successfully created.' })
@@ -17,6 +23,7 @@ export class BlogController {
         const result = await this.blogService.create(createBlogDto);
         return res.status(result.status).json(result);
     }
+
 
     @Get()
     @ApiOperation({ summary: 'Find all blogs by region' })

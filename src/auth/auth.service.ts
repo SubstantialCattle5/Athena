@@ -18,7 +18,7 @@ import { SignUpDTO } from './dto/signup.dto';
 export class AuthService {
   constructor(
     readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) readonly cacheManager: Cache,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     readonly jwtService: JwtService,
     readonly mailService: MailService,
     readonly configService: ConfigService,
@@ -32,7 +32,6 @@ export class AuthService {
           email
         }
       })
-      console.log("🚀 ~ AuthService ~ signup ~ checkUser:", checkUser)
       if (checkUser) {
         return {
           error: "User exist",
@@ -81,7 +80,7 @@ export class AuthService {
 
       this.mailService.sendUsersOtp(email, otp);
 
-      this.cacheManager.set(otpId, { otp, user }, 1000 * 60 * 5); // set for 5 minutes
+      this.cacheManager.set(otpId, { otp, user }, 0); // set for 5 minutes
       return { otpId };
     } catch (error) {
       if (error == 'NotFoundError') {
@@ -100,7 +99,7 @@ export class AuthService {
     if (otpNew === otp) {
       this.cacheManager.del(otpId);
       const { accessToken, refreshToken } = await this.generateToken(user);
-      this.cacheManager.set(refreshToken, user, 1000 * 60 * 60 * 24 * 30); //* set for 30 days
+      this.cacheManager.set(refreshToken, user, 0); //* set for 30 days
       return { accessToken, refreshToken };
     }
     throw new UnauthorizedException(['Invalid OTP']);
@@ -114,7 +113,7 @@ export class AuthService {
     this.cacheManager.del(refreshToken);
     const { accessToken, refreshToken: newRefreshToken } =
       await this.generateToken(user);
-    this.cacheManager.set(newRefreshToken, user, 60 * 60 * 24 * 30 * 1000); //* set for 30 days
+    this.cacheManager.set(newRefreshToken, user, 0); //* set for 30 days
     return { accessToken, refreshToken: newRefreshToken };
   }
 

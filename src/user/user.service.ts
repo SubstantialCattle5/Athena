@@ -1,25 +1,34 @@
-import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/CreateUser.dto';
 
 @Injectable()
 export class UserService {
-  private readonly logger = new Logger(UserService.name);
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const user = await this.prismaService.user.create({
+      const user = await this.prismaService.user.findUnique({
+        where: {
+          email: createUserDto.email
+        }
+      })
+      if (user) {
+        throw new BadRequestException(["User already exist"])
+      }
+      return await this.prismaService.user.create({
         data: createUserDto,
+        select: {
+          age: true, birthday: true, gender: true, email: true, location: true, position: true, picture: true
+        }
       });
-      this.logger.log(`User created with email: ${user.email}`);
-      return user;
     } catch (error) {
       this.handlePrismaError(error, 'create user');
     }
   }
+
 
   async findAll() {
     try {
@@ -29,13 +38,13 @@ export class UserService {
     }
   }
 
-  async findOne(email: string) {
+
+  async findOne(userId: number) {
     try {
       const user = await this.prismaService.user.findUnique({
-        where: { email },
+        where: { id: userId },
       });
       if (!user) {
-        this.logger.warn(`User not found with email: ${email}`);
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
       return user;
@@ -44,25 +53,23 @@ export class UserService {
     }
   }
 
-  async update(email: string, updateUserDto: UpdateUserDto) {
+  async update(id : number, updateUserDto: UpdateUserDto) {
     try {
       const user = await this.prismaService.user.update({
-        where: { email },
+        where: { id },
         data: updateUserDto,
       });
-      this.logger.log(`User updated with email: ${email}`);
       return user;
     } catch (error) {
       this.handlePrismaError(error, 'update user');
     }
   }
 
-  async remove(email: string) {
+  async remove(id: number) {
     try {
       const user = await this.prismaService.user.delete({
-        where: { email },
+        where: { id },
       });
-      this.logger.log(`User deleted with email: ${email}`);
       return user;
     } catch (error) {
       this.handlePrismaError(error, 'delete user');
@@ -70,12 +77,18 @@ export class UserService {
   }
 
 
-  private handlePrismaError(error: unknown, context: string) {
-    if (error instanceof Error) {
-      this.logger.error(`Failed to ${context}: ${error.message}`, error.stack);
+  private handlePrismaError(error: any, context: string) {
+    if (error.code) {
+      // Handle known Prisma errors based on the error code
+      switch (error.code) {
+        case 'P2002': // Unique constraint failed
+          throw new BadRequestException(`A record with this ${error.meta.target} already exists.`);
+        // Add more cases as needed
+        default:
+          throw new BadRequestException(`An error occurred while trying to ${context}`);
+      }
     } else {
-      this.logger.error(`Failed to ${context}: ${String(error)}`);
+      throw new BadRequestException(`An unexpected error occurred while trying to ${context}`);
     }
-    throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
