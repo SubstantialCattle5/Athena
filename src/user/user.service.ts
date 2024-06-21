@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus, BadRequestException } from '@nes
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/CreateUser.dto';
-
+import * as util from "./util";
 @Injectable()
 export class UserService {
 
@@ -10,6 +10,7 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+      util.checkDto(createUserDto);
       const user = await this.prismaService.user.findUnique({
         where: {
           email: createUserDto.email
@@ -25,7 +26,7 @@ export class UserService {
         }
       });
     } catch (error) {
-      this.handlePrismaError(error, 'create user');
+      throw (error);
     }
   }
 
@@ -34,7 +35,7 @@ export class UserService {
     try {
       return await this.prismaService.user.findMany();
     } catch (error) {
-      this.handlePrismaError(error, 'fetch all users');
+      throw (error);
     }
   }
 
@@ -49,19 +50,21 @@ export class UserService {
       }
       return user;
     } catch (error) {
-      this.handlePrismaError(error, 'fetch user');
+      throw (error);
     }
   }
 
-  async update(id : number, updateUserDto: UpdateUserDto) {
+
+  async update(id: number, updateUserDto: UpdateUserDto) {
     try {
+      util.checkUpdateDto(updateUserDto);
       const user = await this.prismaService.user.update({
         where: { id },
         data: updateUserDto,
       });
       return user;
     } catch (error) {
-      this.handlePrismaError(error, 'update user');
+      throw (error);
     }
   }
 

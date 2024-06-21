@@ -1,4 +1,4 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger, BadRequestException } from '@nestjs/common';
 import { Response } from 'express';
 import { Prisma } from '@prisma/client';
 
@@ -17,10 +17,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = `Database request failed: ${(exception as Prisma.PrismaClientKnownRequestError).message}`;
     } else if (exception instanceof Prisma.PrismaClientValidationError) {
       status = HttpStatus.BAD_REQUEST;
-      message = `Validation failed: ${(exception as Prisma.PrismaClientValidationError).message}`;
+      message = `Validation failed: Fill it up properly`;
     } else if (exception instanceof HttpException) {
       status = (exception as HttpException).getStatus();
       message = (exception as HttpException).getResponse() as string;
+    } else if (exception instanceof BadRequestException) {
+      status = (exception as BadRequestException).getStatus();
+      message = (exception as BadRequestException).getResponse() as string;
     } else if (exception instanceof Error) {
       // Handle generic Error instances
       status = HttpStatus.INTERNAL_SERVER_ERROR;
