@@ -1,12 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, SetMetadata, Catch, UseFilters } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { User } from 'src/auth/auth.decorator';
 import { UserInterface } from 'src/auth/interfaces/user.interface';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
 
+@UseFilters(AllExceptionsFilter)
+@ApiBearerAuth()
+@SetMetadata('roles', ['SUPERVISOR', 'EMPLOYEE'])
+@UseGuards(JwtGuard, RolesGuard)
 @ApiTags("Task")
 @Controller('tasks')
 export class TasksController {
@@ -33,23 +39,23 @@ export class TasksController {
     return result;
   }
 
-  // // Endpoint for fetching a specific task by its ID
-  // @Get(':id')
-  // @ApiOperation({ summary: "Find a specific task" })
-  // @ApiResponse({ status: 200, description: 'Task retrieved successfully.' })
-  // @ApiParam({ name: 'id', type: Number, description: 'The ID of the task', required: true })
-  // async findOne(@Param('id') id: string) {
-  //   const result = await this.tasksService.findOne(+id);
-  //   return result;
-  // }
+  // Endpoint for fetching a specific task by its ID
+  @Get(':id')
+  @ApiOperation({ summary: "Find a specific task" })
+  @ApiResponse({ status: 200, description: 'Task retrieved successfully.' })
+  @ApiParam({ name: 'id', type: Number, description: 'The ID of the task', required: true })
+  async findOne(@Param('id') id: string) {
+    const result = await this.tasksService.findOne(+id);
+    return result;
+  }
 
   // Endpoint for updating a task by its ID
   @Patch(':id')
   @ApiOperation({ summary: "Update a specific task" })
   @ApiResponse({ status: 200, description: 'Task updated successfully.' })
   @ApiParam({ name: 'id', type: Number, description: 'The ID of the task', required: true })
-  async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    const result = await this.tasksService.update(+id, updateTaskDto);
+  async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto, @User() user: UserInterface) {
+    const result = await this.tasksService.update(+id, updateTaskDto,user.id);
     return result;
   }
 
