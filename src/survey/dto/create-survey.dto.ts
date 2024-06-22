@@ -1,5 +1,6 @@
-import { IsArray, IsNumber, IsString } from "class-validator";
+import { IsArray, IsEnum, IsString } from "class-validator";
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateQuestionDto } from "./create-question.dto";
 
 export class CreateSurveyDto {
 
@@ -11,14 +12,11 @@ export class CreateSurveyDto {
     @IsString()
     description: string;
 
-    @ApiProperty({ description: 'The ID of the user creating the survey.' })
-    @IsNumber()
-    userId: number;
 
-    @ApiProperty({description : "Array of question ids"})
+    @ApiProperty({ description: "Array of question ids" })
     @IsArray()
-    oldQuestions : number[] ; 
+    questions: CreateQuestionDto[];
 
 
-    
+
 }

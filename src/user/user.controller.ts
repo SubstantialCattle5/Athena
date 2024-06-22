@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Catch, UseFilters } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
@@ -6,13 +6,15 @@ import { CreateUserDto } from './dto/CreateUser.dto';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { User } from 'src/auth/auth.decorator';
 import { UserInterface } from 'src/auth/interfaces/user.interface';
+import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
 
+
+@UseFilters(AllExceptionsFilter)
 @ApiTags('user')
 @Controller('user')
 export class UserController {
 
   constructor(private readonly userService: UserService) { }
-
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
   @ApiBody({ type: CreateUserDto })
@@ -23,8 +25,7 @@ export class UserController {
     return user;
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+
   @Get('/all')
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users.' })

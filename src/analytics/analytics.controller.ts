@@ -7,7 +7,6 @@ import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filte
 @Controller('analytics')
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) { }
-
   @Post()
   findAll(@Body() dateRangeDto: DateRangeDto) {
     return this.analyticsService.findAll(dateRangeDto);

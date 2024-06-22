@@ -1,86 +1,102 @@
-import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSurveyDto } from './dto/create-survey.dto';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-
+import { QuestionType } from "@prisma/client"
+import { SurveyResponseDto } from './dto/survey-response.dto';
 @Injectable()
 export class SurveyService {
   constructor(private readonly prismaService: PrismaService) { }
 
-  async create(createSurveyDto: CreateSurveyDto) {
-    // const { topic, description, userId, questions } = createSurveyDto;
-    // const user = await this.prismaService.user.findFirst({
-    //   where: {
-    //     id: userId,
-    //   },
-    // });
+  async create(createSurveyDto: CreateSurveyDto, userId: number) {
+    try {
+      const { topic, description, questions } = createSurveyDto;
+      const result = await this.prismaService.$transaction(async (prisma) => {
+        const survey = await prisma.survey.create({
+          data: {
+            description,
+            topic,
+            userId
+          }
+        })
+        await Promise.all(questions.map(
+          (question) => {
+            return prisma.question.create({
+              data: {
+                correctAnswer: "what your heart desires",
+                text: question.text,
+                type: question.type as QuestionType,
+                options: question.options,
+                surveyId: survey.id
+              }
+            })
+          }
+        ))
+      })
 
-    // if (!user) {
-    //   throw new BadRequestException('User not found');
-    // }
-
-    // const survey = await this.prismaService.survey.create({
-    //   data: {
-    //     topic,
-    //     description,
-    //     userId: user.id,
-    //     questions : { 
-    //       connect : questions.map(id => ({id}))
-    //     }
-    //   },
-    // });
-    const survey = "fix"
-    return survey;
+      return result;
+    } catch (error) {
+      throw (error)
+    }
   }
 
-  async findAll() {
-    const surveys = await this.prismaService.survey.findMany();
-    return surveys;
+  async findAll(topic: string) {
+    try {
+      return await this.prismaService.survey.findMany({
+        where: {
+          topic
+        },
+        select: {
+          questions: {
+            select: {
+              options: true,
+              text: true,
+              type: true
+            }
+          }
+        }
+      });
+    } catch (error) {
+      throw (error)
+    }
   }
 
   async findOne(id: number) {
-    const survey = await this.prismaService.survey.findUnique({
-      where: { id },
-    });
+    try {
+      const survey = await this.prismaService.survey.findUnique({
+        where: { id },
+      });
 
-    if (!survey) {
-      throw new NotFoundException('Survey not found');
+      if (!survey) {
+        throw new NotFoundException('Survey not found');
+      }
+
+      return survey;
+    } catch (error) {
+      throw (error)
     }
-
-    return survey;
   }
 
-  async update(id: number, updateSurveyDto: UpdateSurveyDto) {
-    const survey = await this.prismaService.survey.findUnique({
-      where: { id },
-    });
-
-    if (!survey) {
-      throw new NotFoundException('Survey not found');
-    }
-
-    const updatedSurvey = await this.prismaService.survey.update({
-      where: { id },
-      data: updateSurveyDto,
-    });
-
-    return updatedSurvey;
-  }
 
   async remove(id: number) {
-    const survey = await this.prismaService.survey.findUnique({
-      where: { id },
-    });
+    try {
+      const survey = await this.prismaService.survey.findUnique({
+        where: { id },
+      });
 
-    if (!survey) {
-      throw new NotFoundException('Survey not found');
+      if (!survey) {
+        throw new NotFoundException('Survey not found');
+      }
+
+      await this.prismaService.survey.delete({
+        where: { id },
+      });
+
+      return `Survey removed successfully`;
+    } catch (error) {
+      throw error
     }
 
-    await this.prismaService.survey.delete({
-      where: { id },
-    });
-
-    return `Survey removed successfully`;
   }
 
   async getInferences(topic: string) {
@@ -104,5 +120,25 @@ export class SurveyService {
     }
 
     return response.data;
+  }
+
+  async surveyResponse(surveyResponse: SurveyResponseDto, userId: number) {
+    const { answers } = surveyResponse;
+    try {
+      await Promise.all(answers.map(
+        (answer) => {
+          return this.prismaService.answer.create({
+            data: {
+              response: answer.response,
+              questionId: answer.questionId,
+              userId
+            }
+          })
+        }
+      ))
+    }
+    catch (error) {
+      throw (error)
+    }
   }
 }

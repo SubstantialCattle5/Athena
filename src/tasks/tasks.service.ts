@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,12 +11,12 @@ export class TasksService {
    * Asynchronously creates a new task.
    * 
    * This function creates a task with the given details, associates it with the users
-   * identified by their email and ID, and sets the task status to 'UPCOMING'.
+   * identified by their email and ID, and sets the task status to UPCOMING.
    * 
    * @param {CreateTaskDto} createTaskDto - The data transfer object containing task details.
    * @param {number} userId - The ID of the user issuing the task.
    * @returns The newly created task object.
-   * @throws {InternalServerErrorException} If there is an error during task creation.
+   * @throws {InternalServerErrorException,HttpException,BadRequestException} If there is an error during task creation.
    */
   async create(createTaskDto: CreateTaskDto, userId: number) {
     const { IssuedToEmail, date, taskName } = createTaskDto;
@@ -46,7 +46,7 @@ export class TasksService {
 
       return result;
     } catch (error) {
-      throw new InternalServerErrorException('Error in generating task');
+      throw (error)
     }
   }
 
@@ -56,38 +56,43 @@ export class TasksService {
 * This function retrieves all tasks where the user is either the issuer or the assignee.
 * It differentiates the tasks issued by the user from those issued to the user.
 * 
-* @param {string} email - The email of the user whose tasks are to be found.
+* @param {number} userId  - The id of the user whose tasks are to be found.
 * @returns An object containing two arrays: 'issuedToTheUser' and 'issuedByTheUser'.
-* @throws {NotFoundException} If the user with the given email is not found.
+* @throws {NotFoundException,HttpException,BadRequestException} If the user with the given id is not found.
 */
   async findAll(userId: number) {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id: userId
-      }
-    });
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where: {
+          id: userId
+        }
+      });
 
-    if (!user) {
-      throw new NotFoundException('User not found');
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const tasks = await this.prismaService.task.findMany({
+        where: {
+          OR: [
+            {
+              issuedById: user.id
+            },
+            {
+              userId: user.id
+            }
+          ]
+        }
+      });
+
+      return {
+        issuedToTheUser: tasks.filter(task => task.issuedById == user.id),
+        issuedByTheUser: tasks.filter(task => task.userId == user.id)
+      };
     }
-
-    const tasks = await this.prismaService.task.findMany({
-      where: {
-        OR: [
-          {
-            issuedById: user.id
-          },
-          {
-            userId: user.id
-          }
-        ]
-      }
-    });
-
-    return {
-      issuedToTheUser: tasks.filter(task => task.issuedById == user.id),
-      issuedByTheUser: tasks.filter(task => task.userId == user.id)
-    };
+    catch (error) {
+      throw (error)
+    }
   }
 
   /**
@@ -98,7 +103,7 @@ export class TasksService {
  * 
  * @param {number} id - The ID of the task to be retrieved.
  * @returns The task object if found.
- * @throws {NotFoundException} If no task with the given ID is found.
+ * @throws {NotFoundException,HttpException,BadRequestException} If no task with the given ID is found.
  */
   async findOne(id: number) {
     try {
@@ -107,14 +112,12 @@ export class TasksService {
           id
         }
       });
-
       if (!task) {
         throw new NotFoundException('Task not available');
       }
-
       return task;
     } catch (error) {
-      throw new InternalServerErrorException('Something went wrong')
+      throw (error)
     }
 
   }
@@ -132,12 +135,13 @@ export class TasksService {
  * @throws {NotFoundException} If no task with the given ID is found.
  * @throws {InternalServerErrorException} If there is an error during task update.
  */
-  async update(id: number, updateTaskDto: UpdateTaskDto) {
+  async update(id: number, updateTaskDto: UpdateTaskDto, userId: number) {
     const { IssuedToEmail, date, taskName, status } = updateTaskDto;
 
     const task = await this.prismaService.task.findUnique({
       where: {
-        id
+        id,
+        userId 
       }
     });
 
@@ -191,7 +195,7 @@ export class TasksService {
 
       return `Task #${id} removed successfully`;
     } catch (error) {
-      throw new InternalServerErrorException('Error in removing task');
+      throw (error)
     }
   }
 }
