@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query } from '@nestjs/common';
 import { SurveyService } from './survey.service';
 import { CreateSurveyDto } from './dto/create-survey.dto';
-import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserInterface } from 'src/auth/interfaces/user.interface';
 import { User } from 'src/auth/auth.decorator';
@@ -34,12 +33,6 @@ export class SurveyController {
     return this.surveyService.findOne(+id);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: "Update a specific survey" })
-  @ApiResponse({ status: 200, description: 'Survey updated successfully.' })
-  update(@Param('id') id: string, @Body() updateSurveyDto: UpdateSurveyDto, @User() user: UserInterface) {
-    return this.surveyService.update(+id, +user.id, updateSurveyDto);
-  }
 
   @Delete(':id')
   @ApiOperation({ summary: "Remove a specific survey" })

@@ -77,17 +77,6 @@ export class SurveyService {
     }
   }
 
-  async update(id: number,userId:number,updateSurveyDto: UpdateSurveyDto) {
-    try {
-      const survey = await this.prismaService.survey.findUniqueOrThrow({
-        where : {
-          id , userId
-        }
-      })
-    } catch (error) {
-      throw (error)
-    }
-  }
 
   async remove(id: number) {
     try {
