@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/CreateUser.dto';
-import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { JwtGuard } from "../auth/guards/auth.guard";
 import { User } from 'src/auth/auth.decorator';
 import { UserInterface } from 'src/auth/interfaces/user.interface';
 import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';

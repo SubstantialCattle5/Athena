@@ -3,7 +3,7 @@ import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from "@nestjs/swagg
 import { BlogService } from "./blog.service";
 import { CreateBlogDto } from "./dto/create-blog.dto";
 import { UpdateBlogDto } from "./dto/update-blog.dto";
-import { JwtGuard } from "src/auth/guards/auth.guard";
+import { JwtGuard } from "../auth/guards/auth.guard";
 
 
 @ApiTags('blog')

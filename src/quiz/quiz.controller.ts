@@ -4,7 +4,7 @@ import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UserInterface } from 'src/auth/interfaces/user.interface';
 import { User } from 'src/auth/auth.decorator';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
-import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { JwtGuard } from "../auth/guards/auth.guard";
 import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
 
 @UseFilters(AllExceptionsFilter)

@@ -3,7 +3,7 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { JwtGuard } from "../auth/guards/auth.guard";
 import { User } from 'src/auth/auth.decorator';
 import { UserInterface } from 'src/auth/interfaces/user.interface';
 import { RolesGuard } from 'src/auth/guards/roles.guard';

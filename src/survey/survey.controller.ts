@@ -6,7 +6,7 @@ import { UserInterface } from 'src/auth/interfaces/user.interface';
 import { User } from 'src/auth/auth.decorator';
 import { SurveyResponseDto } from './dto/survey-response.dto';
 import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
-import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { JwtGuard } from "../auth/guards/auth.guard";
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags("Survey")
