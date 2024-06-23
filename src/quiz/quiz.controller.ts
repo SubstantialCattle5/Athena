@@ -13,11 +13,12 @@ import { AllExceptionsFilter } from '../custom-exception/custom-exception.filter
 export class QuizController {
   constructor(private readonly quizService: QuizService) { }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  // @ApiBearerAuth()
+  // @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createQuizDto: CreateQuizDto, @User() user: UserInterface) {
-    return this.quizService.create(user.id, createQuizDto);
+  create(@Body() createQuizDto: CreateQuizDto) {
+    const userId = 1 ; 
+    return this.quizService.create(userId, createQuizDto);
   }
 
   @Get("/question/:topic")

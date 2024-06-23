@@ -1,6 +1,5 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSurveyDto } from './dto/create-survey.dto';
-import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { QuestionType } from "@prisma/client"
 import { SurveyResponseDto } from './dto/survey-response.dto';

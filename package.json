@@ -9,7 +9,7 @@
     "build": "nest build && cp -r ./src/mail/templates ./dist/mail/templates",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch && cp -r src/mail/templates ./dist/mail/",
+    "start:dev": "nest start --watch & node scripts/copyTemplates.js",
     "start:debug": "nest start --debug --watch",
     "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
     "start:prod": "node dist/src/main",
