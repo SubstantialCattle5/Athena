@@ -161,4 +161,54 @@ export class SurveyService {
       throw (error)
     }
   }
+
+  async surveyResponseBasedOnId(id: number) {
+    try {
+      const repsonses =  await this.prismaService.survey.findUniqueOrThrow({
+        where: {
+          id
+        },
+        select: {
+          description: true,
+          topic: true,
+          questions: {
+            select: {
+              answers: {
+                include: {
+                  user: {
+                    select: {
+                      gender: true, age: true, location: true
+                    }
+                  }
+                }
+              },
+              id: true,
+              options: true,
+              text: true,
+            }
+          }
+        }
+      })
+      return {
+        "description" : repsonses.description, 
+        "topic" : repsonses.topic, 
+        "questions" : repsonses.questions.map((res) => { 
+          return { 
+            "text" : res.text,
+            "options" : res.options,
+            "answers" : res.answers.map((ans) => { 
+              return { 
+                "response" : ans.response,
+                "age" : ans.user.age,
+                "gender" : ans.user.gender,
+                "location" : ans.user.location
+              }
+            })
+          }
+        })
+      }
+    } catch (error) {
+      throw (error)
+    }
+  }
 }

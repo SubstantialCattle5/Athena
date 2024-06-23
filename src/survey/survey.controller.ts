@@ -68,4 +68,11 @@ export class SurveyController {
   async postResponse(@User() user: UserInterface, @Body() surveyResponse: SurveyResponseDto) {
     return await this.surveyService.surveyResponse(surveyResponse, user.id)
   }
+
+
+  @Get('/response/:id')
+  @ApiOperation({ summary: "Response to a survey based on id" })
+  async ReponseBasedOnId(@Param('id') surveyId: string) {
+    return await this.surveyService.surveyResponseBasedOnId(+surveyId);
+  }
 }
