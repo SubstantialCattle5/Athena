@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DateRangeDto } from './dto/date-range.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { calculatePercentageChange, millisecondsToReadableTime } from './util';
 
 @Injectable()

@@ -4,10 +4,10 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtGuard } from "../auth/guards/auth.guard";
-import { User } from 'src/auth/auth.decorator';
-import { UserInterface } from 'src/auth/interfaces/user.interface';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
+import { User } from '../auth/auth.decorator';
+import { UserInterface } from '../auth/interfaces/user.interface';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { AllExceptionsFilter } from '../custom-exception/custom-exception.filter';
 
 @UseFilters(AllExceptionsFilter)
 @ApiBearerAuth()

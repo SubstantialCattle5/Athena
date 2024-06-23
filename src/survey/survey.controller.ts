@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Param, Delete, Query, UseFilters, UseGuard
 import { SurveyService } from './survey.service';
 import { CreateSurveyDto } from './dto/create-survey.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserInterface } from 'src/auth/interfaces/user.interface';
-import { User } from 'src/auth/auth.decorator';
+import { UserInterface } from '../auth/interfaces/user.interface';
+import { User } from '../auth/auth.decorator';
 import { SurveyResponseDto } from './dto/survey-response.dto';
-import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
+import { AllExceptionsFilter } from '../custom-exception/custom-exception.filter';
 import { JwtGuard } from "../auth/guards/auth.guard";
 
 @UseFilters(AllExceptionsFilter)

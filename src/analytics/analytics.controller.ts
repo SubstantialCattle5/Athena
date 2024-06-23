@@ -1,7 +1,7 @@
 import { Body, Controller, Post, UseFilters } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import { DateRangeDto } from './dto/date-range.dto';
-import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
+import { AllExceptionsFilter } from '../custom-exception/custom-exception.filter';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Analytics')

@@ -4,9 +4,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { JwtGuard } from "../auth/guards/auth.guard";
-import { User } from 'src/auth/auth.decorator';
-import { UserInterface } from 'src/auth/interfaces/user.interface';
-import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
+import { User } from '../auth/auth.decorator';
+import { UserInterface } from '../auth/interfaces/user.interface';
+import { AllExceptionsFilter } from '../custom-exception/custom-exception.filter';
 
 
 @UseFilters(AllExceptionsFilter)

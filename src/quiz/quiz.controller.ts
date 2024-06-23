@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, UseFilters } from '@nestjs/common';
 import { QuizService } from './quiz.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
-import { UserInterface } from 'src/auth/interfaces/user.interface';
-import { User } from 'src/auth/auth.decorator';
+import { UserInterface } from '../auth/interfaces/user.interface';
+import { User } from '../auth/auth.decorator';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from "../auth/guards/auth.guard";
-import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
+import { AllExceptionsFilter } from '../custom-exception/custom-exception.filter';
 
 @UseFilters(AllExceptionsFilter)
 @ApiTags("Quiz")
