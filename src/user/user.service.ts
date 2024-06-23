@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus, BadRequestException } from '@nes
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/CreateUser.dto';
-import * as util from "./util";
+import * as util from "./validation";
 @Injectable()
 export class UserService {
 

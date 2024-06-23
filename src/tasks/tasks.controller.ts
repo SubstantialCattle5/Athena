@@ -29,7 +29,7 @@ export class TasksController {
   }
 
   // Endpoint for fetching all tasks related to a specific user
-  @Get(':id')
+  @Get('/fetch/:id')
   @ApiOperation({ summary: "Find all tasks based on user" })
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
   @ApiParam({ name: 'id', type: Number, required: true })

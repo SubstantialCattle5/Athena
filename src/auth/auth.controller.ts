@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseFilters } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RefreshDto } from './dto/refresh.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -9,7 +9,9 @@ import {
   refreshResponseDoc, signupResponseDoc
 } from './responses';
 import { SignUpDTO } from './dto/signup.dto';
+import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
 
+@UseFilters(AllExceptionsFilter)
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {

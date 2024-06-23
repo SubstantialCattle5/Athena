@@ -7,7 +7,7 @@ export class SignUpDTO {
     name: string;
 
     @ApiProperty({ description: 'The age of the user' })
-    age: number;
+    age: string;
 
     @ApiProperty({ description: 'The birthday of the user', type: String, format: 'date-time' })
     birthday: Date;

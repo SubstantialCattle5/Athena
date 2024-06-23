@@ -13,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { otpCache } from './interfaces/otpCache.interface';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { SignUpDTO } from './dto/signup.dto';
-
+import * as validation from "./validation"
 @Injectable()
 export class AuthService {
   constructor(
@@ -25,8 +25,9 @@ export class AuthService {
   ) { }
 
   async signup(signUpDto: SignUpDTO) {
-    const { age, birthday, contact, email, gender, location, name, picture, position } = signUpDto;
     try {
+      validation.validateSignUpDTO(signUpDto);
+      const { age, birthday, contact, email, gender, location, name, picture, position } = signUpDto;
       const checkUser = await this.prisma.user.findUnique({
         where: {
           email
@@ -39,9 +40,9 @@ export class AuthService {
           message: 'User already exists',
         };
       }
-      return await this.prisma.user.create({
+      const user = await this.prisma.user.create({
         data: {
-          age,
+          age: parseInt(age),
           birthday,
           contact,
           email,
@@ -52,13 +53,11 @@ export class AuthService {
           position
         }
       })
+
+      return this.login(user.email);
     }
     catch (error) {
-      return {
-        statusCode: 501,
-        message: 'An error occurred during signup',
-        error: "unknown error occured",
-      };
+      throw (error)
     }
 
   }

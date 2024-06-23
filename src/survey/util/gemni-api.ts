@@ -7,7 +7,7 @@
  * https://ai.google.dev/gemini-api/docs/get-started/node
  */
 
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel, ChatSession, GenerationConfig } from "@google/generative-ai";
+import { GoogleGenerativeAI, GenerativeModel, ChatSession, GenerationConfig } from "@google/generative-ai";
 
 // Ensure the environment variable is typed
 const apiKey: string = process.env.GEMINI_API_KEY as string;

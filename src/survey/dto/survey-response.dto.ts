@@ -10,6 +10,4 @@ export class answersDto {
     questionId: number;
     @ApiProperty()
     response: string;
-    @ApiProperty()
-    userId: number;
 }

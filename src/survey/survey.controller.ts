@@ -1,11 +1,14 @@
-import { Controller, Get, Post, Body, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { SurveyService } from './survey.service';
 import { CreateSurveyDto } from './dto/create-survey.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserInterface } from 'src/auth/interfaces/user.interface';
 import { User } from 'src/auth/auth.decorator';
 import { SurveyResponseDto } from './dto/survey-response.dto';
+import { AllExceptionsFilter } from 'src/custom-exception/custom-exception.filter';
+import { JwtGuard } from 'src/auth/guards/auth.guard';
 
+@UseFilters(AllExceptionsFilter)
 @ApiTags("Survey")
 @Controller('survey')
 export class SurveyController {
@@ -50,7 +53,8 @@ export class SurveyController {
     return await this.surveyService.getInferences(topic);
   }
 
-
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @Post('surveyresponse')
   @ApiOperation({ summary: "Response to a survey" })
   async postResponse(@User() user: UserInterface, @Body() surveyResponse: SurveyResponseDto) {

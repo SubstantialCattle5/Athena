@@ -17,7 +17,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = `Database request failed: ${(exception as Prisma.PrismaClientKnownRequestError).message}`;
     } else if (exception instanceof Prisma.PrismaClientValidationError) {
       status = HttpStatus.BAD_REQUEST;
-      message = `Validation failed: Fill it up properly`;
+      message = (exception as Prisma.PrismaClientValidationError).message.length < 50 ? (exception as Prisma.PrismaClientValidationError).message : `Validation failed: Fill it up properly`;
     } else if (exception instanceof HttpException) {
       status = (exception as HttpException).getStatus();
       message = (exception as HttpException).getResponse() as string;

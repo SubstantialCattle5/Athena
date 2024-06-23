@@ -7,21 +7,8 @@ import { Prisma } from '@prisma/client';
 export class QuizService {
 
   constructor(private readonly prismaService: PrismaService) { }
-
-  private handleError(error: any): never {
-    console.error(error); // Log the error for debugging
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      throw new Error(`Database request failed: ${error.message}`);
-    } else if (error instanceof Prisma.PrismaClientValidationError) {
-      throw new Error(`Validation failed: ${error.message}`);
-    } else {
-      throw new Error('An unexpected error occurred');
-    }
-  }
-
   async create(userId: number, createQuizDto: CreateQuizDto) {
     const { questions, topic } = createQuizDto;
-
     try {
       const result = await this.prismaService.$transaction(async (prisma) => {
         const quiz = await prisma.quiz.create({
@@ -48,7 +35,7 @@ export class QuizService {
 
       return result;
     } catch (error) {
-      this.handleError(error);
+      throw (error);
     }
   }
 
@@ -74,7 +61,7 @@ export class QuizService {
         questions: quiz.questions
       }));
     } catch (error) {
-      this.handleError(error);
+      throw (error);
     }
   }
 
@@ -89,10 +76,25 @@ export class QuizService {
 
       return quiz;
     } catch (error) {
-      this.handleError(error);
+      throw (error);
     }
   }
 
+  async findTopics() {
+    try {
+      const quizTopics =  await this.prismaService.quiz.findMany(
+        {
+          select: {
+            topic: true
+          } , 
+          distinct : ['topic']
+        }
+      );
+      return quizTopics.flatMap((quizTopic) => quizTopic.topic) ; 
+    } catch (error) {
+      throw error
+    }
+  }
   // async update(id: number, updateQuizDto: UpdateQuizDto) {
   //   try {
   //     const updatedQuiz = await this.prismaService.quiz.update({
@@ -118,7 +120,7 @@ export class QuizService {
 
       return deletedQuiz;
     } catch (error) {
-      this.handleError(error);
+      throw (error);
     }
   }
 }
