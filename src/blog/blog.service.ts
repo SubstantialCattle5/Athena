@@ -46,6 +46,12 @@ export class BlogService {
     @ApiResponse({ status: 200, description: 'Blogs retrieved successfully.' })
     @ApiResponse({ status: 404, description: 'No blogs found for the specified region.' })
     async findAll(region: string) {
+        if (region === "") { 
+            return { 
+                status : 200 , 
+                data : await this.prismaService.blog.findMany()
+            }
+        }
         const blogs = await this.prismaService.blog.findMany({
             where: { region }
         });

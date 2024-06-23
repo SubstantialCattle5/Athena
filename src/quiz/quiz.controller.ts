@@ -24,10 +24,17 @@ export class QuizController {
   @ApiParam(
     { name: 'topic', required: true, description: "put a topic" }
   )
-  findAll(@Body() topics: { topicName: string }) {
+  findAllBasedTopics(@Body() topics: { topicName: string }) {
     const topicName = topics.topicName;
     return this.quizService.findAll(topicName);
   }
+
+
+  @Get()
+  async findAll() { 
+    return this.quizService.findAll(""); 
+  }
+
 
   @Get("/topics")
   findTopics() {

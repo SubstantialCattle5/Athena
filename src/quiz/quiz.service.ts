@@ -41,6 +41,27 @@ export class QuizService {
 
   async findAll(topic: string) {
     try {
+      if (topic === "") {
+        const quizzesFull = await this.prismaService.quiz.findMany({
+          include: {
+            questions: {
+              select: {
+                text: true,
+                type: true,
+                correctAnswer: true,
+                options: true
+              }
+            }
+          }
+        });
+
+        return quizzesFull.map(quiz => ({
+          topic: quiz.topic,
+          created: quiz.createdAt,
+          questions: quiz.questions
+        }))
+      }
+
       const quizzes = await this.prismaService.quiz.findMany({
         where: { topic },
         include: {
@@ -82,15 +103,15 @@ export class QuizService {
 
   async findTopics() {
     try {
-      const quizTopics =  await this.prismaService.quiz.findMany(
+      const quizTopics = await this.prismaService.quiz.findMany(
         {
           select: {
             topic: true
-          } , 
-          distinct : ['topic']
+          },
+          distinct: ['topic']
         }
       );
-      return quizTopics.flatMap((quizTopic) => quizTopic.topic) ; 
+      return quizTopics.flatMap((quizTopic) => quizTopic.topic);
     } catch (error) {
       throw error
     }

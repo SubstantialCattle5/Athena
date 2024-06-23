@@ -8,13 +8,9 @@ import { JwtGuard } from "src/auth/guards/auth.guard";
 
 @ApiTags('blog')
 @Controller('blog')
-@ApiBearerAuth('JWT')
-@UseGuards(JwtGuard)
 export class BlogController {
     constructor(private readonly blogService: BlogService) { }
 
-    @ApiBearerAuth()
-    @UseGuards(JwtGuard)
     @Post()
     @ApiOperation({ summary: 'Create a new blog' })
     @ApiResponse({ status: 201, description: 'The blog has been successfully created.' })
@@ -29,8 +25,17 @@ export class BlogController {
     @ApiOperation({ summary: 'Find all blogs by region' })
     @ApiResponse({ status: 200, description: 'Blogs retrieved successfully.' })
     @ApiResponse({ status: 404, description: 'No blogs found for the specified region.' })
-    async findAll(@Query('region') region: string, @Res() res) {
+    async findAllByRegion(@Query('region') region: string, @Res() res) {
         const result = await this.blogService.findAll(region);
+        return res.status(result.status).json(result);
+    }
+
+    @Get("/all")
+    @ApiOperation({ summary: 'Find all blogs' })
+    @ApiResponse({ status: 200, description: 'Blogs retrieved successfully.' })
+    @ApiResponse({ status: 404, description: 'No blogs found for the specified region.' })
+    async findAll(@Res() res) {
+        const result = await this.blogService.findAll("");
         return res.status(result.status).json(result);
     }
 

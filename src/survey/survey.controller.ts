@@ -23,10 +23,18 @@ export class SurveyController {
   }
 
   @Get(":topic")
+  @ApiOperation({ summary: "Find all surveys based on topics" })
+  @ApiResponse({ status: 200, description: 'Surveys retrieved successfully.' })
+  findAllByTopic(@Param('topic') topic: string) {
+    return this.surveyService.findAll(topic);
+  }
+
+
+  @Get()
   @ApiOperation({ summary: "Find all surveys" })
   @ApiResponse({ status: 200, description: 'Surveys retrieved successfully.' })
-  findAll(@Param('topic') topic: string) {
-    return this.surveyService.findAll(topic);
+  findAll() {
+    return this.surveyService.findAll("");
   }
 
   @Get(':id')

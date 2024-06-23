@@ -42,16 +42,37 @@ export class SurveyService {
 
   async findAll(topic: string) {
     try {
+      if (topic === "") {
+        return await this.prismaService.survey.findMany({
+          select: {
+            id: true,
+            topic: true,
+            description: true,
+            questions: {
+              select: {
+                options: true,
+                text: true,
+                type: true,
+                id: true,
+              }
+            }
+          }
+        });
+      }
       return await this.prismaService.survey.findMany({
         where: {
           topic
         },
         select: {
+          id: true,
+          topic: true,
+          description: true,
           questions: {
             select: {
               options: true,
               text: true,
-              type: true
+              type: true,
+              id: true,
             }
           }
         }
