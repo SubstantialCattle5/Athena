@@ -43,8 +43,8 @@ export class QuizController {
   }
 
 
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  // @ApiBearerAuth()
+  // @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.quizService.remove(+id);

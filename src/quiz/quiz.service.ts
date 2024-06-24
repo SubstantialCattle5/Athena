@@ -49,7 +49,7 @@ export class QuizService {
                 text: true,
                 type: true,
                 correctAnswer: true,
-                options: true
+                options: true,
               }
             }
           }
@@ -58,7 +58,8 @@ export class QuizService {
         return quizzesFull.map(quiz => ({
           topic: quiz.topic,
           created: quiz.createdAt,
-          questions: quiz.questions
+          questions: quiz.questions,
+          id: quiz.id
         }))
       }
 

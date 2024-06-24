@@ -11,7 +11,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     let status: HttpStatus;
     let message: string;
-
+    
     if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       message = `Database request failed: ${(exception as Prisma.PrismaClientKnownRequestError).message}`;
