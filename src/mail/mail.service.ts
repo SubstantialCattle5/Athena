@@ -98,10 +98,12 @@ export class MailService {
       </html>
     `;
 
-    await this.mailerService.sendMail({
+    console.log('Sending email to', email);
+    const info = await this.mailerService.sendMail({
       to: email,
       subject: 'Your OTP for GooglexYug',
       html: htmlContent, 
     });
+    console.log('Message sent: %s', info.messageId);
   }
 }

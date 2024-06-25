@@ -77,7 +77,7 @@ export class AuthService {
       const otp = randomInt(100000, 1000000); // 6 digit otp
       const otpId = randomUUID();
 
-      this.mailService.sendUsersOtp(email, otp);
+      await this.mailService.sendUsersOtp(email, otp);
 
       this.cacheManager.set(otpId, { otp, user }, 0); // set for 5 minutes
       return { otpId };
