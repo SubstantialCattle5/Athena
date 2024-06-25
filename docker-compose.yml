@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  app:
+    image: googlexyug
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    command: ["yarn", "run", "start:migrate:prod"]
