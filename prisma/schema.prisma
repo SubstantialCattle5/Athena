@@ -22,13 +22,14 @@ model User {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   blogs          Blog[]
-  tasks          Task[]         @relation("UserTasks")
   issuedTasks    Task[]         @relation("IssuedTasks")
   sleepData      SleepData[]
   surveys        Survey[]
   medicalQueries MedicalQuery[]
   answers        Answer[]
   Quiz           Quiz[]
+  Task           Task?          @relation(fields: [taskId], references: [id])
+  taskId         Int?
 
   @@index([email])
   @@index([name])
@@ -73,12 +74,10 @@ model Task {
   status     TaskStatus
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
-  user       User?      @relation(name: "UserTasks", fields: [userId], references: [id], onDelete: Cascade)
-  userId     Int?
   issuedBy   User?      @relation(name: "IssuedTasks", fields: [issuedById], references: [id], onDelete: SetNull)
   issuedById Int?
+  issuedTo   User[]
 
-  @@index([userId])
   @@index([issuedById])
 }
 
