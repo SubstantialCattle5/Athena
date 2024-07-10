@@ -34,11 +34,7 @@ export class AuthService {
         }
       })
       if (checkUser) {
-        return {
-          error: "User exist",
-          statusCode: 400,
-          message: 'User already exists',
-        };
+        throw new UnauthorizedException(['User already exist']);
       }
       const user = await this.prisma.user.create({
         data: {
