@@ -194,35 +194,41 @@ export class SurveyService {
     return response.data;
   }
 
-  async surveyResponse(surveyResponse: SurveyResponseDto, userId: number) {
+  async surveyResponse(
+    surveyResponse: SurveyResponseDto,
+    userId: number,
+    surveyId: number
+  ) {
     const { answers } = surveyResponse;
     try {
-
-      // check if the user has already responded to the survey
-      const userResponse = await this.prismaService.answer.findMany({
+      // Check if the user has already responded to the survey
+      const existingResponses = await this.prismaService.answer.findMany({
         where: {
-          userId
-        }
-      })
+          userId,
+          question: {
+            surveyId,
+          },
+        },
+      });
 
-      if (userResponse.length > 0) {
-        throw new HttpException('User has already responded to the survey', 400)
+      if (existingResponses.length > 0) {
+        throw new HttpException('User has already responded to this survey', 400);
       }
 
-      await Promise.all(answers.map(
-        (answer) => {
+      // Create each answer and link it to the survey
+      await Promise.all(
+        answers.map((answer) => {
           return this.prismaService.answer.create({
             data: {
               response: answer.response,
               questionId: answer.questionId,
-              userId
-            }
-          })
-        }
-      ))
-    }
-    catch (error) {
-      throw (error)
+              userId,
+            },
+          });
+        })
+      );
+    } catch (error) {
+      throw error;
     }
   }
 
