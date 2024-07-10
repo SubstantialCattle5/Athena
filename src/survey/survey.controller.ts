@@ -37,6 +37,15 @@ export class SurveyController {
     return this.surveyService.findAll("");
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Get("/user/:id")
+  @ApiOperation({ summary: "Find all surveys for a user" })
+  @ApiResponse({ status: 200, description: 'Surveys retrieved successfully.' })
+  async findSurveysForUser(@Param('id') id: number) {
+    return await this.surveyService.findSurveysForUser(+id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: "Find a specific survey" })
   @ApiResponse({ status: 200, description: 'Survey retrieved successfully.' })

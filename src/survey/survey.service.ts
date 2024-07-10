@@ -81,6 +81,57 @@ export class SurveyService {
     }
   }
 
+  async findSurveysForUser(userId: number) {
+    try {
+      // Fetch all surveys
+      const allSurveys = await this.prismaService.survey.findMany({
+        select: {
+          id: true,
+          topic: true,
+          description: true,
+          questions: {
+            select: {
+              options: true,
+              text: true,
+              type: true,
+              id: true,
+            },
+          },
+        },
+      });
+  
+      // Fetch surveys that the user has responded to
+      const respondedSurveys = await this.prismaService.answer.findMany({
+        where: {
+          userId,
+        },
+        select: {
+          question: {
+            select: {
+              surveyId: true,
+            },
+          },
+        },
+      });
+  
+      // Create a set of survey IDs that the user has responded to
+      const respondedSurveyIds = new Set(
+        respondedSurveys.map((response) => response.question.surveyId)
+      );
+  
+      // Filter out surveys that the user has responded to
+      const surveys = allSurveys.filter(
+        (survey) => !respondedSurveyIds.has(survey.id)
+      );
+  
+      return surveys;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  
+
   async findOne(id: number) {
     try {
       const survey = await this.prismaService.survey.findUnique({
@@ -96,6 +147,7 @@ export class SurveyService {
       throw (error)
     }
   }
+
 
 
   async remove(id: number) {
@@ -145,6 +197,18 @@ export class SurveyService {
   async surveyResponse(surveyResponse: SurveyResponseDto, userId: number) {
     const { answers } = surveyResponse;
     try {
+
+      // check if the user has already responded to the survey
+      const userResponse = await this.prismaService.answer.findMany({
+        where: {
+          userId
+        }
+      })
+
+      if (userResponse.length > 0) {
+        throw new HttpException('User has already responded to the survey', 400)
+      }
+
       await Promise.all(answers.map(
         (answer) => {
           return this.prismaService.answer.create({
