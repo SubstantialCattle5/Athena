@@ -24,15 +24,23 @@ export class MedicalService {
   }
 
   findAll() {
-    return `This action returns all medical`;
+    return this.prismaService.medicalQuery.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} medical`;
+    return this.prismaService.medicalQuery.findUnique({
+      where: {
+        id: id
+      }
+    });
   }
 
 
   remove(id: number) {
-    return `This action removes a #${id} medical`;
+    return this.prismaService.medicalQuery.delete({
+      where: {
+        id: id
+      }
+    });
   }
 }
