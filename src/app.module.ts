@@ -10,6 +10,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { QuizModule } from './quiz/quiz.module';
 import { APP_PIPE } from '@nestjs/core';
+import { MedicalModule } from './medical/medical.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { APP_PIPE } from '@nestjs/core';
     TasksModule,
     AnalyticsModule,
     QuizModule,
+    MedicalModule,
   ],
 })
 export class AppModule { }
