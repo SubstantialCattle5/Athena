@@ -60,6 +60,8 @@ model Blog {
   userId     Int?
   region     String   @default("general")
 
+  language String @default("english")
+
   @@index([userId])
   @@index([title])
 }
