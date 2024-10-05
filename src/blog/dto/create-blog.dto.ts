@@ -14,7 +14,7 @@ export class CreateBlogDto {
   region: string;
 
   @IsInt()
-  authorId: number;
+  authorId: string;
 
   @IsString()
   language: string;

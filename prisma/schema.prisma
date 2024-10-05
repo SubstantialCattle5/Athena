@@ -9,18 +9,21 @@ datasource db {
 
 // User model represents the application users
 model User {
-  id             Int            @id @default(autoincrement())
-  name           String         @db.VarChar(100)
-  age            Int
-  birthday       DateTime
-  location       String         @db.VarChar(255)
-  gender         Gender
-  email          String         @unique @db.VarChar(255)
-  contact        String         @db.VarChar(20)
-  picture        String         @db.VarChar(255)
-  position       Position
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(100)
+  age       Int
+  birthday  DateTime
+  language  String   @default("english")
+  location  String   @db.VarChar(255)
+  gender    Gender
+  email     String   @unique @db.VarChar(255)
+  contact   String   @db.VarChar(20)
+  picture   String   @db.VarChar(255)
+  position  Position
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
   blogs          Blog[]
   tasks          Task[]         @relation("UserTasks")
   issuedTasks    Task[]         @relation("IssuedTasks")
@@ -50,7 +53,7 @@ enum Position {
 
 // Blog model represents blog posts authored by users
 model Blog {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(uuid()) @db.Uuid
   title      String   @db.VarChar(255)
   picture    String   @db.VarChar(255)
   content    String   @db.Text
@@ -58,7 +61,7 @@ model Blog {
   updatedAt  DateTime @updatedAt
   authorName String   @db.VarChar(100)
   user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     Int?
+  userId     String?  @db.Uuid
   region     String   @default("general")
 
   language String @default("english")
@@ -69,16 +72,16 @@ model Blog {
 
 // Task model represents tasks associated with users
 model Task {
-  id         Int        @id @default(autoincrement())
+  id         String     @id @default(uuid()) @db.Uuid
   date       DateTime
   taskName   String     @db.VarChar(255)
   status     TaskStatus
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   user       User?      @relation(name: "UserTasks", fields: [userId], references: [id], onDelete: Cascade)
-  userId     Int?
+  userId     String?    @db.Uuid
   issuedBy   User?      @relation(name: "IssuedTasks", fields: [issuedById], references: [id], onDelete: SetNull)
-  issuedById Int?
+  issuedById String?    @db.Uuid
 
   @@index([userId])
   @@index([issuedById])
@@ -93,7 +96,7 @@ enum TaskStatus {
 
 // SleepData model represents sleep data associated with users
 model SleepData {
-  id         Int       @id @default(autoincrement())
+  id         String    @id @default(uuid()) @db.Uuid
   date       DateTime
   sleepStart DateTime
   sleepEnd   DateTime
@@ -101,7 +104,7 @@ model SleepData {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     Int?
+  userId     String?   @db.Uuid
 
   @@index([userId])
 }
@@ -115,32 +118,33 @@ enum SleepType {
 
 // Survey model represents surveys created by users
 model Survey {
-  id          Int        @id @default(autoincrement())
+  id          String     @id @default(uuid()) @db.Uuid
   topic       String     @default("question") @db.VarChar(255)
   description String     @db.Text
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   user        User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int?
+  userId      String?    @db.Uuid
   questions   Question[]
 
   @@index([userId])
   @@index([topic])
 }
 
+// Quiz model represents quizzes created by users
 model Quiz {
   id        Int        @id @default(autoincrement())
   topic     String     @default("periods") @db.VarChar(255)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   questions Question[]
-  userId    Int?
+  userId    String?    @db.Uuid
   user      User?      @relation(fields: [userId], references: [id])
 
   @@index([topic])
 }
 
-// Question model represents questions in surveys
+// Question model represents questions in surveys or quizzes
 model Question {
   id            Int          @id @default(autoincrement())
   text          String       @db.Text
@@ -153,7 +157,7 @@ model Question {
   updatedAt DateTime @updatedAt
 
   survey   Survey? @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  surveyId Int?
+  surveyId String? @db.Uuid
 
   Quiz   Quiz? @relation(fields: [quizId], references: [id])
   quizId Int?
@@ -168,14 +172,14 @@ enum QuestionType {
   BOOLEAN
 }
 
-// Answer model represents answers to survey questions
+// Answer model represents answers to survey or quiz questions
 model Answer {
-  id         Int       @id @default(autoincrement())
+  id         String    @id @default(uuid()) @db.Uuid
   response   String    @db.Text
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     Int?
+  userId     String?   @db.Uuid
   question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
   questionId Int?
 
@@ -185,14 +189,14 @@ model Answer {
 
 // MedicalQuery model represents medical queries made by users
 model MedicalQuery {
-  id        Int         @id @default(autoincrement())
+  id        String      @id @default(uuid()) @db.Uuid
   query     String      @db.Text
   response  String      @db.Text
   status    QueryStatus
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   user      User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int?
+  userId    String?     @db.Uuid
 
   @@index([userId])
 }

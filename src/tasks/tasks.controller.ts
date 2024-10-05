@@ -35,7 +35,7 @@ export class TasksController {
   @ApiParam({ name: 'id', type: Number, required: true })
   async findAll(@Param('id') userId: string) {
 
-    const result = await this.tasksService.findAll(+userId);
+    const result = await this.tasksService.findAll(userId);
     return result;
   }
 
@@ -45,7 +45,7 @@ export class TasksController {
   @ApiResponse({ status: 200, description: 'Task retrieved successfully.' })
   @ApiParam({ name: 'id', type: Number, description: 'The ID of the task', required: true })
   async findOne(@Param('id') id: string) {
-    const result = await this.tasksService.findOne(+id);
+    const result = await this.tasksService.findOne(id);
     return result;
   }
 
@@ -55,7 +55,7 @@ export class TasksController {
   @ApiResponse({ status: 200, description: 'Task updated successfully.' })
   @ApiParam({ name: 'id', type: Number, description: 'The ID of the task', required: true })
   async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto, @User() user: UserInterface) {
-    const result = await this.tasksService.update(+id, updateTaskDto,user.id);
+    const result = await this.tasksService.update(id, updateTaskDto,user.id);
     return result;
   }
 
@@ -65,7 +65,7 @@ export class TasksController {
   @ApiResponse({ status: 200, description: 'Task removed successfully.' })
   @ApiParam({ name: 'id', type: Number, description: 'The ID of the task', required: true })
   async remove(@Param('id') id: string) {
-    const result = await this.tasksService.remove(+id);
+    const result = await this.tasksService.remove(id);
     return result;
   }
 }

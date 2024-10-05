@@ -6,17 +6,20 @@ import { AllExceptionsFilter } from './custom-exception/custom-exception.filter'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    cors: true
+    cors: true,
   });
   app.use(cookieParser());
 
   // Swagger docs with authentication
   const config = new DocumentBuilder()
-    .setTitle('GooglexYug')
-    .setDescription('The googlexyug API description')
+    .setTitle('Athena Backend ')
+    .setDescription('The Athena API description')
     .setVersion('1.0')
     .addTag('app')
-    .addBearerAuth({ type: 'http', bearerFormat: "JWT", scheme: "bearer", in: "header" }, "access-token")
+    .addBearerAuth(
+      { type: 'http', bearerFormat: 'JWT', scheme: 'bearer', in: 'header' },
+      'access-token',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

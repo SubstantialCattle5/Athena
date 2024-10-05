@@ -17,7 +17,7 @@ export class QuizController {
   // @UseGuards(JwtGuard)
   @Post()
   create(@Body() createQuizDto: CreateQuizDto) {
-    const userId = 1 ; 
+    const userId = `1` ; 
     return this.quizService.create(userId, createQuizDto);
   }
 

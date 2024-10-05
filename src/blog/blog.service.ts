@@ -117,7 +117,7 @@ export class BlogService {
    */
   @ApiResponse({ status: 200, description: 'Blog retrieved successfully.' })
   @ApiResponse({ status: 404, description: 'Blog not found.' })
-  async findById(id: number) {
+  async findById(id: string) {
     const blog = await this.prismaService.blog.findUnique({
       where: { id },
     });
@@ -137,7 +137,7 @@ export class BlogService {
    */
   @ApiResponse({ status: 200, description: 'Blog updated successfully.' })
   @ApiResponse({ status: 404, description: 'Blog not found.' })
-  async update(id: number, updateBlogDto: UpdateBlogDto) {
+  async update(id: string, updateBlogDto: UpdateBlogDto) {
     const { title, region, pic, content } = updateBlogDto;
 
     const existingBlog = await this.prismaService.blog.findUnique({
@@ -163,7 +163,7 @@ export class BlogService {
    */
   @ApiResponse({ status: 200, description: 'Blog deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Blog not found.' })
-  async delete(id: number) {
+  async delete(id: string) {
     const existingBlog = await this.prismaService.blog.findUnique({
       where: { id },
     });

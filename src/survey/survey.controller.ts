@@ -18,7 +18,7 @@ export class SurveyController {
   @ApiOperation({ summary: "Create a new survey" })
   @ApiResponse({ status: 201, description: 'The survey has been successfully created.' })
   create(@Body() createSurveyDto: CreateSurveyDto) {
-    const userId = 1;
+    const userId = `1`;
     return this.surveyService.create(createSurveyDto, userId);
   }
 
@@ -41,7 +41,7 @@ export class SurveyController {
   @ApiOperation({ summary: "Find a specific survey" })
   @ApiResponse({ status: 200, description: 'Survey retrieved successfully.' })
   findOne(@Param('id') id: string) {
-    return this.surveyService.findOne(+id);
+    return this.surveyService.findOne(id);
   }
 
 
@@ -49,7 +49,7 @@ export class SurveyController {
   @ApiOperation({ summary: "Remove a specific survey" })
   @ApiResponse({ status: 200, description: 'Survey removed successfully.' })
   remove(@Param('id') id: string) {
-    return this.surveyService.remove(+id);
+    return this.surveyService.remove(id);
   }
 
   @Get('inferences')
@@ -73,6 +73,6 @@ export class SurveyController {
   @Get('/response/:id')
   @ApiOperation({ summary: "Response to a survey based on id" })
   async ReponseBasedOnId(@Param('id') surveyId: string) {
-    return await this.surveyService.surveyResponseBasedOnId(+surveyId);
+    return await this.surveyService.surveyResponseBasedOnId(surveyId);
   }
 }

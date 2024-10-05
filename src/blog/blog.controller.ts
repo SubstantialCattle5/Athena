@@ -71,8 +71,8 @@ export class BlogController {
   @ApiOperation({ summary: 'Find a blog by ID' })
   @ApiResponse({ status: 200, description: 'Blog retrieved successfully.' })
   @ApiResponse({ status: 404, description: 'Blog not found.' })
-  async findById(@Param('id') id: number, @Res() res) {
-    const result = await this.blogService.findById(+id);
+  async findById(@Param('id') id: string, @Res() res) {
+    const result = await this.blogService.findById(id);
     return res.status(result.status).json(result);
   }
 
@@ -81,11 +81,11 @@ export class BlogController {
   @ApiResponse({ status: 200, description: 'Blog updated successfully.' })
   @ApiResponse({ status: 404, description: 'Blog not found.' })
   async update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateBlogDto: UpdateBlogDto,
     @Res() res,
   ) {
-    const result = await this.blogService.update(+id, updateBlogDto);
+    const result = await this.blogService.update(id, updateBlogDto);
     return res.status(result.status).json(result);
   }
 
@@ -93,8 +93,8 @@ export class BlogController {
   @ApiOperation({ summary: 'Delete a blog by ID' })
   @ApiResponse({ status: 200, description: 'Blog deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Blog not found.' })
-  async delete(@Param('id') id: number, @Res() res) {
-    const result = await this.blogService.delete(+id);
+  async delete(@Param('id') id: string, @Res() res) {
+    const result = await this.blogService.delete(id);
     return res.status(result.status).json(result);
   }
 }

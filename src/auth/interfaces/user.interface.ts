@@ -1,4 +1,4 @@
 export interface UserInterface { 
-    id: number ; 
+    id: string ; 
     position?: string; 
 }
